@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
-
+from Rag import core_Rag
 
 app = FastAPI()
 
@@ -8,13 +8,14 @@ class Message(BaseModel):
     user: str
     text: str
 
-messages = []
+questions = []
+answers=[]
 
-@app.post("/messages/")
+@app.post("/chat")
 async def create_message(message: Message):
-    messages.append(message)
-    return message
+    questions.append(message)
+    answer = core_Rag(message)
+    answers.append(answer)
+    return answer
 
-@app.get("/messages/")
-async def get_messages():
-    return messages
+
