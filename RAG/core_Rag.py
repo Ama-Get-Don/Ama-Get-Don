@@ -21,7 +21,7 @@ llm = OpenAI(temperature=0.2, model="gpt-4")
 # 엠베딩 모델 정보
 embed_model = OpenAIEmbedding()
 # data 디렉터리에서 문서로드
-documents = SimpleDirectoryReader("../data").load_data()
+documents = SimpleDirectoryReader("./data").load_data()
 
 db = chromadb.PersistentClient(path="./new_chroma_db")
 chroma_collection = db.get_or_create_collection("quickstart")
