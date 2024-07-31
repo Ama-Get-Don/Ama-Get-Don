@@ -41,7 +41,7 @@ def core_Rag(message):
 
     # 이전 대화 요약
     history_summary = summarize_history()
-
+    print(history_summary)
     # 요약된 대화 맥락과 현재 메시지를 결합한 쿼리 작성
     combined_message = f"Preveous summary: {history_summary}\nUser query:{message}"
 
