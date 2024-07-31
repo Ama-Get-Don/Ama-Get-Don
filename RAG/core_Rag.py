@@ -16,6 +16,8 @@ from llama_index.core import StorageContext
 import chromadb
 from llama_index.vector_stores.chroma import ChromaVectorStore
 
+from Chat.core_Chat import *
+
 # llm 모델 정보
 llm = OpenAI(temperature=0.2, model="gpt-4")
 # 엠베딩 모델 정보
@@ -36,7 +38,16 @@ index = VectorStoreIndex.from_documents(documents, storage_context=storage_conte
 query_engine = index.as_query_engine(llm=llm)
 
 def core_Rag(message):
-    response = query_engine.query(message)
+
+    # 이전 대화 요약
+    history_summary = summarize_history()
+    print(history_summary)
+    # 요약된 대화 맥락과 현재 메시지를 결합한 쿼리 작성
+    combined_message = f"Preveous summary: {history_summary}\nUser query:{message}"
+
+
+    response = query_engine.query(combined_message)
+
     return response
 
 '''
