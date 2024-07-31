@@ -6,12 +6,12 @@ import tiktoken
 
 # 대화정보 요약하는 LLM
 model = "gpt-4-0125-preview"
-summarizer_llm = OpenAiLlm(model_name=model, max_tokens=256)
+summarizer_llm = OpenAiLlm(model_name=model, max_tokens=256) # 요약해서 생성하는 토큰의 수는 256이 최대이다.
 tokenizer_fn = tiktoken.encoding_for_model(model).encode
 
 memory = ChatSummaryMemoryBuffer.from_defaults(
     llm=summarizer_llm,
-    token_limit=256,  # 토큰 한도 설정
+    token_limit=1024,  # 메모리에 토큰이 1024넘어가면 요약함
     tokenizer_fn=tokenizer_fn,
 )
 
