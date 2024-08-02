@@ -64,12 +64,9 @@ async def core_Rag(message, user_info):
     streaming_response = query_engine.query(combined_message)
 
     print("현재 뽑히고 있는:")
-    response_text = ""
     for text in streaming_response.response_gen:
-        print(text)
-        response_text += text
+        yield text
 
-    return response_text
 
 '''
 # 문서를 노드 단위로 분할
