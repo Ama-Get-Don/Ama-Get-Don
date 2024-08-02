@@ -34,6 +34,7 @@ async def create_message(message: user_Message): # user_Message 형태로 매핑
         "user_info": user_info
     }
 
+
     return JSONResponse(content={"status": "ok"}, media_type="application/json; charset=utf-8")
 
 # SSE 통신 (GET)
