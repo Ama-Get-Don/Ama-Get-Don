@@ -1,7 +1,7 @@
 import { Button, Col, Row } from "antd"
 import { styled } from "styled-components";
 
-export const SignUp = () => {
+export const SignIn = () => {
     return (
         <Container>
             <StyledButton>아이디를 입력해주세요</StyledButton>

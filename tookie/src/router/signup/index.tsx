@@ -1,9 +1,14 @@
 import { RouteObject } from "react-router-dom";
-import { SignUp } from "../../pages/signup";
+import { Terms } from "../../pages/signup/Terms";
 
 const signUpRoute: RouteObject = {
     path: 'sign-up',
-    element: <SignUp />
+    children: [
+        {
+            path: 'terms',
+            element: <Terms />
+        }
+    ]
 };
 
 export default signUpRoute;
