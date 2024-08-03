@@ -8,7 +8,7 @@ const { Content } = AntdLayout;
 export function LayoutComponent({ children }: PropsWithChildren): ReactElement {
     return (
         <Layout>
-            <AppHeader/>
+            <AppHeader />
             <AntdContent>{children}</AntdContent>
         </Layout>
     )

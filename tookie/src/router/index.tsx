@@ -4,10 +4,10 @@ import { LayoutComponent } from "../common";
 
 const router = createBrowserRouter([
     {
-        path:'',
+        path: '',
         element: (
             <LayoutComponent>
-               <Outlet/>
+                <Outlet />
             </LayoutComponent>
         ),
         children: [homeRoute]

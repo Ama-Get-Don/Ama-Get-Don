@@ -7,7 +7,7 @@ const { Header } = Layout;
 const AppHeader: React.FC = () => {
   return (
     <HeaderStyled>
-      <Logo>MyApp</Logo>
+      <Logo>Tookie</Logo>
       <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['1']}>
         <Menu.Item key="1" icon={<HomeOutlined />}>
           Home
@@ -21,7 +21,7 @@ const AppHeader: React.FC = () => {
       </Menu>
     </HeaderStyled>
   )
-    
+
 }
 
 export default AppHeader;
@@ -30,7 +30,6 @@ const HeaderStyled = styled(Header)`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 20px;
 `;
 
 const Logo = styled.div`
