@@ -10,6 +10,10 @@ import json
 import uvicorn
 import asyncio
 
+from starlette.middleware.cors import CORSMiddleware
+
+from user import user_router
+
 
 app = FastAPI()
 backend_json={} # 클라이언트에 넘길 데이터
@@ -38,9 +42,7 @@ async def create_message(message: user_Message): # user_Message 형태로 매핑
     return JSONResponse(content={"status": "ok"}, media_type="application/json; charset=utf-8")
 
 # SSE 통신 (GET)
-# 1) user_id를 url에 담아서 사용자의 데이터를 구분한다.
-# 2)
-
+# user_id를 url에 담아서 사용자의 데이터를 구분한다.
 @app.get("/stream/{user}")
 async def stream(user: str):
     async def event_generator():
@@ -62,3 +64,17 @@ async def stream(user: str):
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 
+
+origins = [
+
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.include_router(user_router.router)
