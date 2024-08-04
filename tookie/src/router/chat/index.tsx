@@ -5,7 +5,7 @@ const chatRoute: RouteObject = {
     path: 'chat',
     children: [
         {
-            path: '/',
+            path: '',
             element: <Chat />
         }
     ]
