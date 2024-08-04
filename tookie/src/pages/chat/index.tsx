@@ -27,8 +27,8 @@ export const Chat = () => {
             setMessages([...messages, userMessage]);
             setInput('');
 
-            // OpenAI API 호출
-            const response = "abcd"
+            // TODO: Backend API 호출
+            const response = "response from api"
 
             const botMessage = {
                 id: messages.length + 2,
