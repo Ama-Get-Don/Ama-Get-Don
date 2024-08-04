@@ -17,6 +17,29 @@ export const Chat = () => {
     const [messages, setMessages] = useState(messagesInitialState);
     const [input, setInput] = useState('');
 
+    const fetchAPI = async (message: string): Promise<string> => {
+        // TODO: Backend API 호출 코드 작성
+        const endpoint = 'BACKEND API CODE';
+
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer API_KEY`,
+            },
+            body: JSON.stringify({
+                prompt: message,
+                max_tokens: 150,
+                n: 1,
+                stop: null,
+                temperature: 0.7,
+            }),
+        });
+
+        const data = await response.json();
+        return data.choices[0].text.trim();
+    };
+
     const handleSend = async () => {
         if (input.trim()) {
             const userMessage = {
@@ -28,7 +51,7 @@ export const Chat = () => {
             setInput('');
 
             // TODO: Backend API 호출
-            const response = "response from api"
+            const response = fetchAPI(input)
 
             const botMessage = {
                 id: messages.length + 2,
