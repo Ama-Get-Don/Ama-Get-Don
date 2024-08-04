@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Button, Checkbox, Form, Select } from 'antd';
 import { CheckboxChangeEvent } from 'antd/es/checkbox';
 import { styled } from 'styled-components';
@@ -48,8 +48,7 @@ export const Survey = () => {
   };
 
   const handleNext = () => {
-    navigate('/sign-up/complete'); // Navigate to the complete page
-    console.log("다음 단계로 이동");
+    navigate('/sign-up/complete'); 
   };
 
   return (
