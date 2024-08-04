@@ -3,6 +3,7 @@ import homeRoute from "./home";
 import { LayoutComponent } from "../common";
 import signUpRoute from "./signup";
 import signInRoute from "./signin";
+import chatRoute from "./chat";
 
 const router = createBrowserRouter([
     {
@@ -12,7 +13,7 @@ const router = createBrowserRouter([
                 <Outlet />
             </LayoutComponent>
         ),
-        children: [homeRoute, signUpRoute, signInRoute]
+        children: [homeRoute, signUpRoute, signInRoute, chatRoute]
     }
 ])
 

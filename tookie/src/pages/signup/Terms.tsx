@@ -2,6 +2,7 @@ import { styled } from "styled-components";
 import { Checkbox, Button, Typography, Space } from 'antd';
 import { useState } from "react";
 import { CheckboxChangeEvent } from "antd/es/checkbox";
+import { useNavigate } from "react-router-dom";
 
 const { Title, Paragraph } = Typography;
 
@@ -10,6 +11,8 @@ export const Terms = () => {
     const [isTerm1Checked, setIsTerm1Checked] = useState(false);
     const [isTerm2Checked, setIsTerm2Checked] = useState(false);
     const [isTerm3Checked, setIsTerm3Checked] = useState(false);
+
+    const navigate = useNavigate();
 
     const handleAllCheckChange = (e: CheckboxChangeEvent) => {
         const checked = e.target.checked;
@@ -22,6 +25,12 @@ export const Terms = () => {
     const handleTermChange = () => {
         setIsAllChecked(isTerm1Checked && isTerm2Checked);
     };
+
+    const handleNext = () => {
+        if (isAllChecked) {
+            navigate('/sign-up/info'); // '/next' 경로로 이동
+        }
+    }
 
     return (
         <Container>
@@ -65,7 +74,7 @@ export const Terms = () => {
                 >
                     [선택 약관]
                 </Checkbox>
-                <Button type="primary" disabled={!isAllChecked}>
+                <Button type="primary" disabled={!isAllChecked} onClick={handleNext}>
                     동의하고 다음으로
                 </Button>
             </Space>

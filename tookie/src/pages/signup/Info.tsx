@@ -1,4 +1,5 @@
 import { Button, Form, Input, Typography, Select, DatePicker } from "antd";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 const { Title } = Typography;
@@ -6,10 +7,15 @@ const { Option } = Select;
 
 export const Info = () => {
     const [form] = Form.useForm();
+    const navigate = useNavigate();
 
     const handleFinish = (values: any) => {
         console.log('Form Values: ', values);
     };
+
+    const handleNext = () => {
+        navigate('/sign-up/survey')
+    }
 
     return (
         <Container>
@@ -78,7 +84,7 @@ export const Info = () => {
                 </Form.Item>
                 <Form.Item wrapperCol={{ span: 24 }}>
                     <ButtonContainer>
-                        <Button type="primary" htmlType="submit">
+                        <Button type="primary" htmlType="submit" onClick={handleNext}>
                             다음
                         </Button>
                     </ButtonContainer>
