@@ -1,11 +1,11 @@
-import { styled } from "styled-components";
+import React, { useState, useEffect } from 'react';
 import { Button, Input, Layout, List, Avatar } from 'antd';
-import { useState } from "react";
+import styled from 'styled-components';
 
 const { Content } = Layout;
 const { TextArea } = Input;
 
-const messagesInitialState = [
+const initialMessages = [
     {
         id: 1,
         sender: 'bot',
@@ -13,32 +13,44 @@ const messagesInitialState = [
     },
 ];
 
+interface Message {
+    id: number;
+    sender: 'user' | 'bot';
+    content: string;
+}
+
 export const Chat = () => {
-    const [messages, setMessages] = useState(messagesInitialState);
+    const [messages, setMessages] = useState(initialMessages);
     const [input, setInput] = useState('');
+    const [eventSource, setEventSource] = useState<EventSource | null>(null);
+    const [partialMessage, setPartialMessage] = useState<string>('');
+    const [isChatEnd, setIsChatEnd] = useState(false);
 
-    const fetchAPI = async (message: string): Promise<string> => {
-        // TODO: Backend API 호출 코드 작성
-        const endpoint = 'BACKEND API CODE';
+    useEffect(() => {
+        // Clean up SSE connection when component unmounts
+        return () => {
+            if (eventSource) {
+                eventSource.close();
+            }
+        };
+    }, [eventSource]);
 
-        const response = await fetch(endpoint, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer API_KEY`,
-            },
-            body: JSON.stringify({
-                prompt: message,
-                max_tokens: 150,
-                n: 1,
-                stop: null,
-                temperature: 0.7,
-            }),
-        });
+    useEffect(() => {
+        // When partialMessage is updated and is empty, add the complete message to the list
+        if (!isChatEnd) return;
 
-        const data = await response.json();
-        return data.choices[0].text.trim();
-    };
+        // Create a bot message with the complete message
+        const botMessage: Message = {
+            id: messages.length + 1,
+            sender: 'bot',
+            content: partialMessage,
+        };
+
+        setMessages((prevMessages) => [...prevMessages, botMessage]);
+        setPartialMessage(''); // Reset partial message after adding to messages
+        setIsChatEnd(false);
+    }, [isChatEnd]);
+
 
     const handleSend = async () => {
         if (input.trim()) {
@@ -50,50 +62,86 @@ export const Chat = () => {
             setMessages([...messages, userMessage]);
             setInput('');
 
-            // TODO: Backend API 호출
-            const response = fetchAPI(input)
+            // Send user message to backend
+            try {
+                const response = await fetch('http://172.30.1.92:3000/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json; charset=utf-8',
+                        'Accept': 'application/json; charset=utf-8',
+                    },
+                    body: JSON.stringify({
+                        user_id: "1",
+                        user_level: 1,
+                        user_chat: input,
+                    }),
+                });
 
-            const botMessage = {
-                id: messages.length + 2,
-                sender: 'bot',
-                content: response,
-            };
-            setMessages((prevMessages) => [...prevMessages, botMessage]);
+                if (response.ok) {
+                    // Only connect to SSE if POST request was successful
+                    connectSSE();
+                } else {
+                    console.error('Failed to send message:', response.status);
+                }
+            } catch (error) {
+                console.error('Error sending message:', error);
+            }
         }
     };
 
+    const connectSSE = () => {
+        if (eventSource) {
+            eventSource.close();
+        }
+
+        const source = new EventSource('http://172.30.1.92:3000/chat/stream/1');
+        setEventSource(source);
+
+        source.onmessage = (event) => {
+            const data = event.data.trim();
+            // Append the received data chunk to the partial message
+            setPartialMessage((prev) => prev + " " + data);
+            // If the data chunk is empty, it indicates the end of a message
+            if (data === '') {
+                setIsChatEnd(true);
+            }
+        };
+
+        source.onerror = (error) => {
+            console.error('EventSource error:', error);
+            source.close();
+        };
+    };
 
     return (
-        <>
-            <Content style={{ padding: '20px 50px' }}>
-                <Container>
-                    <ChatContainer>
-                        <List
-                            dataSource={messages}
-                            renderItem={(item) => (
-                                <List.Item>
-                                    <List.Item.Meta
-                                        avatar={<Avatar>{item.sender === 'bot' ? 'B' : 'U'}</Avatar>}
-                                        title={item.sender === 'bot' ? 'Bot' : 'User'}
-                                        description={item.content}
-                                    />
-                                </List.Item>
-                            )}
-                        />
-                    </ChatContainer>
-                    <InputContainer>
-                        <StyledTextArea
-                            rows={2}
-                            value={input}
-                            onChange={(e) => setInput(e.target.value)}
-                            onPressEnter={handleSend}
-                        />
-                        <Button type="primary" onClick={handleSend}>전송</Button>
-                    </InputContainer>
-                </Container>
-            </Content>
-        </>
-    )
+        <Content style={{ padding: '20px 50px' }}>
+            <Container>
+                <ChatContainer>
+                    <List
+                        dataSource={messages}
+                        renderItem={(item) => (
+                            <List.Item>
+                                <List.Item.Meta
+                                    avatar={<Avatar>{item.sender === 'bot' ? 'B' : 'U'}</Avatar>}
+                                    title={item.sender === 'bot' ? 'Bot' : 'User'}
+                                    description={item.content}
+                                />
+                            </List.Item>
+                        )}
+                    />
+                </ChatContainer>
+                <InputContainer>
+                    <StyledTextArea
+                        rows={2}
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        onPressEnter={handleSend}
+                    />
+                    <Button type="primary" onClick={handleSend}>전송</Button>
+                </InputContainer>
+            </Container>
+        </Content>
+    );
 }
 
 const Container = styled.div`
