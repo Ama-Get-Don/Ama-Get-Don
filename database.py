@@ -5,7 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 
-DATABASE_URL = "mysql+pymysql://root:root@127.0.0.1/fintechdb"
+DATABASE_URL = "mysql+pymysql://admin:fintech0711@127.0.0.1/fintechdb"
 
 
 engine = create_engine(DATABASE_URL)
