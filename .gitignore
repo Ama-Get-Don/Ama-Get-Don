@@ -2,3 +2,6 @@ myvenv/
 config/
 __pycache__/
 .idea/
+data/
+new_chroma_db/
+venv/
