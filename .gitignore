@@ -2,7 +2,6 @@ myvenv/
 config/
 __pycache__/
 .idea/
-alembic.ini
 data/
 new_chroma_db/
-migrations/
+venv/
