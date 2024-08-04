@@ -19,7 +19,7 @@ from llama_index.vector_stores.chroma import ChromaVectorStore
 from Chat.core_Chat import *
 from Prompt.seed import seed
 from Prompt.sprout import sprout
-from Prompt.tooki import tooki
+from Prompt.tookie import tooki
 
 # llm 모델 정보
 llm = OpenAI(temperature=0.2, model="gpt-4")
@@ -48,11 +48,11 @@ async def core_Rag(message, user_info):
 
     # 사용자 수준 별 다른 프롬프트 제공 (사용자에 대한 정보를 반영하여 맞춤형 답변을 준다)
     '''
-    if user_info["level"] == "seed":
+    if user_info["level"] == 1:
         prompt = seed(message, user_info)
-    elif user_info["level"] == "sprout":
+    elif user_info["level"] == 2:
         prompt = sprout(message, user_info)
-    else:
+    elif user_info["level"] == 3:
         prompt = tooki(message, user_info)
     '''
     prompt = message
