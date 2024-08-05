@@ -1,8 +1,10 @@
 myvenv/
-config/
+tookie-BE/config/
 __pycache__/
 .idea/
+tookie-BE/init_db.py
 
-data/
+tookie-BE/data/
 new_chroma_db/
 venv/
+alembic.ini
