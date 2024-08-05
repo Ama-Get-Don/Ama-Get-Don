@@ -2,7 +2,9 @@ myvenv/
 config/
 __pycache__/
 .idea/
+init_db.py
 
 data/
 new_chroma_db/
 venv/
+alembic.ini
