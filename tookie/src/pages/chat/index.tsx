@@ -7,7 +7,7 @@ import sendButtonLight from '/src/assets/sendButtonLight.png';
 const { Content } = Layout;
 const { TextArea } = Input;
 
-const initialMessages = [
+const initialMessages: Message[] = [
     {
         id: 1,
         sender: 'bot',
@@ -22,7 +22,7 @@ interface Message {
 }
 
 export const Chat = () => {
-    const [messages, setMessages] = useState(initialMessages);
+    const [messages, setMessages] = useState<Message[]>(initialMessages);
     const [input, setInput] = useState('');
     const [eventSource, setEventSource] = useState<EventSource | null>(null);
     const [partialMessage, setPartialMessage] = useState<string>('');
@@ -55,7 +55,7 @@ export const Chat = () => {
 
     const handleSend = async () => {
         if (input.trim()) {
-            const userMessage = {
+            const userMessage: Message = {
                 id: messages.length + 1,
                 sender: 'user',
                 content: input,
@@ -121,13 +121,14 @@ export const Chat = () => {
                     <List
                         dataSource={messages}
                         renderItem={(item) => (
-                            <List.Item>
-                                <List.Item.Meta
-                                    avatar={<Avatar>{item.sender === 'bot' ? 'B' : 'U'}</Avatar>}
-                                    title={item.sender === 'bot' ? 'Bot' : 'User'}
-                                    description={item.content}
-                                />
-                            </List.Item>
+                            <MessageItem key={item.id} sender={item.sender}>
+                                <MessageContent sender={item.sender}>
+                                    <Avatar>{item.sender === 'bot' ? 'B' : 'U'}</Avatar>
+                                    <MessageBubble sender={item.sender}>
+                                        {item.content}
+                                    </MessageBubble>
+                                </MessageContent>
+                            </MessageItem>
                         )}
                     />
                 </ChatContainer>
@@ -153,7 +154,10 @@ const Container = styled.div`
     display: flex;
     flex-direction: column;
     height: 100%;
-    padding: 20px;
+    padding: 50px;
+    max-width: 1000px;
+    margin: 0 auto; 
+
 `;
 
 const ChatContainer = styled.div`
@@ -175,7 +179,7 @@ const InputWrapper = styled.div`
 const InputContainer = styled.div`
     display: flex;
     align-items: center;
-    max-width: 1300px; /* 최대 너비 설정 */
+    max-width: 1300px; 
     width: 100%;
     border-radius: 20px;
     border: 1px solid #ddd;
@@ -190,8 +194,8 @@ const StyledTextArea = styled(TextArea)`
     background-color: #f5f5f5;
     padding: 10px;
     resize: none;
-    margin-right: 10px; /* 버튼과의 간격 */
-    overflow: hidden; /* 스크롤바 숨기기 */
+    margin-right: 10px; 
+    overflow: hidden; 
 `;
 
 const StyledButton = styled.button`
@@ -215,3 +219,23 @@ const FooterText = styled.div`
     font-size: 12px;
 `;
 
+const MessageItem = styled.div<{ sender: 'user' | 'bot' }>`
+    display: flex;
+    justify-content: ${props => (props.sender === 'user' ? 'flex-end' : 'flex-start')};
+    margin-bottom: 10px;
+`;
+
+const MessageContent = styled.div<{ sender: 'user' | 'bot' }>`
+    display: flex;
+    align-items: flex-start;
+    flex-direction: ${props => (props.sender === 'user' ? 'row-reverse' : 'row')};
+`;
+
+const MessageBubble = styled.div<{ sender: 'user' | 'bot' }>`
+    max-width: 100%;
+    background-color: ${props => (props.sender === 'user' ? '#d4f7dc' : '#f1f0f0')};
+    color: ${props => (props.sender === 'user' ? '#000' : '#000')};
+    padding: 20px;
+    border-radius: 10px;
+    margin: 0 10px;
+`;
