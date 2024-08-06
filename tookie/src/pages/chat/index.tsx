@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Input, Layout, List, Avatar } from 'antd';
+import { Input, Layout, List, Avatar } from 'antd';
 import styled from 'styled-components';
+import sendButtonDark from '/src/assets/sendButtonDark.png'; 
+import sendButtonLight from '/src/assets/sendButtonLight.png'; 
 
 const { Content } = Layout;
 const { TextArea } = Input;
@@ -27,7 +29,7 @@ export const Chat = () => {
     const [isChatEnd, setIsChatEnd] = useState(false);
 
     useEffect(() => {
-        // Clean up SSE connection when component unmounts
+        // 컴포넌트 언마운트 시 SSE 연결 종료
         return () => {
             if (eventSource) {
                 eventSource.close();
@@ -36,10 +38,10 @@ export const Chat = () => {
     }, [eventSource]);
 
     useEffect(() => {
-        // When partialMessage is updated and is empty, add the complete message to the list
+        // partialMessage가 업데이트되고 비어 있을 때, 전체 메시지를 목록에 추가
         if (!isChatEnd) return;
 
-        // Create a bot message with the complete message
+        // 전체 메시지로 봇 메시지 생성
         const botMessage: Message = {
             id: messages.length + 1,
             sender: 'bot',
@@ -47,10 +49,9 @@ export const Chat = () => {
         };
 
         setMessages((prevMessages) => [...prevMessages, botMessage]);
-        setPartialMessage(''); // Reset partial message after adding to messages
+        setPartialMessage(''); // 메시지 목록에 추가 후 partialMessage 초기화
         setIsChatEnd(false);
     }, [isChatEnd]);
-
 
     const handleSend = async () => {
         if (input.trim()) {
@@ -62,7 +63,7 @@ export const Chat = () => {
             setMessages([...messages, userMessage]);
             setInput('');
 
-            // Send user message to backend
+            // 사용자 메시지를 백엔드로 전송
             try {
                 const response = await fetch('http://172.30.1.92:3000/chat', {
                     method: 'POST',
@@ -78,13 +79,13 @@ export const Chat = () => {
                 });
 
                 if (response.ok) {
-                    // Only connect to SSE if POST request was successful
+                    // POST 요청이 성공하면 SSE에 연결
                     connectSSE();
                 } else {
-                    console.error('Failed to send message:', response.status);
+                    console.error('메시지 전송 실패:', response.status);
                 }
             } catch (error) {
-                console.error('Error sending message:', error);
+                console.error('메시지 전송 중 오류 발생:', error);
             }
         }
     };
@@ -99,22 +100,22 @@ export const Chat = () => {
 
         source.onmessage = (event) => {
             const data = event.data.trim();
-            // Append the received data chunk to the partial message
+            // 수신된 데이터 조각을 partialMessage에 추가
             setPartialMessage((prev) => prev + " " + data);
-            // If the data chunk is empty, it indicates the end of a message
+            // 데이터 조각이 비어 있으면 메시지의 끝을 나타냄
             if (data === '') {
                 setIsChatEnd(true);
             }
         };
 
         source.onerror = (error) => {
-            console.error('EventSource error:', error);
+            console.error('EventSource 오류:', error);
             source.close();
         };
     };
 
     return (
-        <Content style={{ padding: '20px 50px' }}>
+        <Content style={{ padding: '20px 50px', height: '100vh' }}>
             <Container>
                 <ChatContainer>
                     <List
@@ -130,15 +131,19 @@ export const Chat = () => {
                         )}
                     />
                 </ChatContainer>
-                <InputContainer>
-                    <StyledTextArea
-                        rows={2}
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        onPressEnter={handleSend}
-                    />
-                    <Button type="primary" onClick={handleSend}>전송</Button>
-                </InputContainer>
+                <InputWrapper>
+                    <InputContainer>
+                        <StyledTextArea
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            onPressEnter={handleSend}
+                            placeholder="메시지를 입력하세요"
+                            autoSize={{ minRows: 1, maxRows: 10 }} // autoSize 속성 추가
+                        />
+                        <StyledButton onClick={handleSend} />
+                    </InputContainer>
+                    <FooterText>증권 투자는 반드시 자기 자신의 판단과 책임 하에 하여야 하며, 자신의 여유 자금으로 분산 투자하는 것이 좋습니다.</FooterText>
+                </InputWrapper>
             </Container>
         </Content>
     );
@@ -147,7 +152,7 @@ export const Chat = () => {
 const Container = styled.div`
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    height: 100%;
     padding: 20px;
 `;
 
@@ -155,15 +160,58 @@ const ChatContainer = styled.div`
     flex: 1;
     overflow-y: auto;
     padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    margin-bottom: 20px;
+`;
+
+const InputWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
 `;
 
 const InputContainer = styled.div`
     display: flex;
     align-items: center;
-    margin-top: 20px;
+    max-width: 1300px; /* 최대 너비 설정 */
+    width: 100%;
+    border-radius: 20px;
+    border: 1px solid #ddd;
+    background-color: #f5f5f5;
+    padding: 10px;
 `;
 
 const StyledTextArea = styled(TextArea)`
-    margin-right: 10px;
     flex: 1;
+    border-radius: 20px;
+    border: none;
+    background-color: #f5f5f5;
+    padding: 10px;
+    resize: none;
+    margin-right: 10px; /* 버튼과의 간격 */
+    overflow: hidden; /* 스크롤바 숨기기 */
 `;
+
+const StyledButton = styled.button`
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    background-image: url(${sendButtonLight});
+    background-size: cover;
+
+    &:hover {
+        background-image: url(${sendButtonDark});
+    }
+`;
+
+const FooterText = styled.div`
+    text-align: center;
+    margin-top: 10px;
+    color: #888;
+    font-size: 12px;
+`;
+

@@ -1,7 +1,7 @@
 import { Button } from 'antd';
 import { styled } from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import SeedlingImage from '/src/images/seed.png'; 
+import SeedlingImage from '/src/assets/seed.png'; 
 
 export const SignUpComplete = () => {
   const navigate = useNavigate();
