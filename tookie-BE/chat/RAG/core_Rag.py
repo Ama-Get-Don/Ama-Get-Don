@@ -15,7 +15,7 @@ from llama_index.vector_stores.chroma import ChromaVectorStore
 from chat.Multi_Turn.core_Chat import *
 
 # llm 모델 정보
-llm = OpenAI(temperature=0.2, model="gpt-4")
+llm = OpenAI(temperature=0.8, model="gpt-4o")
 # 엠베딩 모델 정보
 embed_model = OpenAIEmbedding()
 # data 디렉터리에서 문서로드
@@ -53,12 +53,19 @@ async def core_Rag(message, user_info):
     print("현재 맥락", history_summary)
     combined_message = f"Preveous summary: {history_summary}\nUser query:{prompt}"
 
+    print(combined_message)
 
-    streaming_response = query_engine.query(combined_message)
+    try:
+        streaming_response = query_engine.query(combined_message)
+        print("현재 뽑히고 있는:")
+        for text in streaming_response.response_gen:
+            yield text
+    except Exception as e:
+        # 문서 검색이 실패할 경우 LLM의 사전 학습된 지식을 바탕으로 응답 생성
+        print("문서 검색 실패:", e)
+        fallback_response = llm.generate(combined_message)
+        yield fallback_response
 
-    print("현재 뽑히고 있는:")
-    for text in streaming_response.response_gen:
-        yield text
 
 
 '''
