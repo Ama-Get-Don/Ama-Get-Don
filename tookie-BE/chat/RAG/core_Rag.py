@@ -39,15 +39,6 @@ async def core_Rag(message, user_info):
     history_summary = summarize_history()
     print(history_summary)
 
-    # 사용자 수준 별 다른 프롬프트 제공 (사용자에 대한 정보를 반영하여 맞춤형 답변을 준다)
-    '''
-    if user_info["level"] == 1:
-        prompt = seed(message, user_info)
-    elif user_info["level"] == 2:
-        prompt = sprout(message, user_info)
-    elif user_info["level"] == 3:
-        prompt = tooki(message, user_info)
-    '''
     prompt = message
     # 요약된 대화 맥락과 현재 프롬프트를 결합한 쿼리 작성
     print("현재 맥락", history_summary)
