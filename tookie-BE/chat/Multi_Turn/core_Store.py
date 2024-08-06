@@ -23,7 +23,7 @@ def summarize_history():
     history = memory.get()
     return " ".join([msg.content for msg in history])
 
-def core_Chat(question, answer):
+def core_Store(question, answer):
     add_message_to_memory(MessageRole.USER, question)
     add_message_to_memory(MessageRole.ASSISTANT, answer)
 

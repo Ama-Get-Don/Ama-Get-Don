@@ -63,7 +63,7 @@ async def stream(user_id: int):
 
                 # 전체 응답을 core_Chat 함수에 전달
                 full_response = ''.join([token async for token in core_Rag(user_chat, user_info)])
-                core_Chat(user_chat, full_response)
+                core_Store(user_chat, full_response)
                 break  # 한 번 응답을 보낸 후 종료
             await asyncio.sleep(1)
 
