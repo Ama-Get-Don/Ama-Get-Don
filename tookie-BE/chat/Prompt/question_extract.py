@@ -1,6 +1,7 @@
 # 질문 2개 추출하는 프롬프트
+from langchain_core.prompts import ChatPromptTemplate
 def question_extract(text):
-    prompt = f'''
+    return ChatPromptTemplate.from_template(f'''
         너는 [사용자의 질문] 에서 1) 투자 법률과 규제 관련 질문과 2) 그외의 질문으로 나누어 추출하는 챗봇이야.
         답변을 줄때 [데이터 형식]대로 결과를 반환 해줘!
         
@@ -16,6 +17,4 @@ def question_extract(text):
         ex2>
         [["외국인 투자에 관한 법적 제한이나 규제는 무엇인가요?"], []]
         ex3>
-        [[], ["LG전자를 매수해도 될까요?"]]
-    '''
-    return prompt
+        [[], ["LG전자를 매수해도 될까요?"]]''')

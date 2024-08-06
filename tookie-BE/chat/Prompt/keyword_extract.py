@@ -1,7 +1,7 @@
 # 키워드 추출하는 프롬프트
+from langchain_core.prompts import ChatPromptTemplate
 def keyword_extract(text):
-    prompt = f'''
-        너는 [사용자의 질문] 에서 1) 투자하고자 하는 회사, 2) 주식관련 키워드를 추출하는 챗봇이야.
+    return ChatPromptTemplate.from_template(f'''너는 [사용자의 질문] 에서 1) 투자하고자 하는 회사, 2) 주식관련 키워드를 추출하는 챗봇이야.
         답변을 줄때 [데이터 형식]대로 결과를 반환 해줘!
         
         [사용자의 질문]    
@@ -13,6 +13,4 @@ def keyword_extract(text):
         ex1>
         [["NVIDIA", "삼성전자", "구글"], ["공매도", "PER", "PBR"]]
         ex2>
-        [["마이크로소프트", "LG전자", "셀트리온"], ["EPS", "급등주", "성장주"]]
-    '''
-    return prompt
+        [["마이크로소프트", "LG전자", "셀트리온"], ["EPS", "급등주", "성장주"]]")''')
