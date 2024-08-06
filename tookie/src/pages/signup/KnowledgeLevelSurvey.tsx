@@ -48,7 +48,7 @@ export const KnowledgeLevelSurvey = () => {
   };
 
   const handleNext = () => {
-    navigate('/sign-up/complete'); 
+    navigate('/sign-up/investment_profile_survey'); 
   };
 
   return (
