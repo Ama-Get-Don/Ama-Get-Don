@@ -2,6 +2,31 @@ import React from 'react';
 import styled from 'styled-components';
 import { Button as AntButton } from 'antd';
 import backgroundImage from '../../assets/homepage.png';
+import { useNavigate } from 'react-router-dom';
+
+
+export const HomePage: React.FC = () => {
+  const navigate = useNavigate(); // useNavigate를 여기서 호출합니다.
+
+  const handleSignUp = () => {
+    navigate('/sign-up/terms');
+  };
+
+  const handleLogin = () => {
+    navigate('/sign-in');
+  };
+
+  return (
+    <HomeContainer>
+      <ButtonContainer>
+        <StyledButton type="default" shape="round" onClick={handleSignUp}>회원가입</StyledButton>
+        <StyledButton type="default" shape="round" onClick={handleLogin}>로그인</StyledButton>
+      </ButtonContainer>
+    </HomeContainer>
+  );
+};
+
+export default HomePage;
 
 const HomeContainer = styled.div`
   display: flex;
@@ -30,17 +55,3 @@ const StyledButton = styled(AntButton)`
   background-color: white;
   border-color: white;
 `;
-
-
-export const HomePage: React.FC = () => {
-  return (
-    <HomeContainer>
-      <ButtonContainer>
-        <StyledButton type="default" onClick={() => console.log('회원가입')}>회원가입</StyledButton>
-        <StyledButton type="default" onClick={() => console.log('로그인')}>로그인</StyledButton>
-      </ButtonContainer>
-    </HomeContainer>
-  );
-};
-
-export default HomePage;

@@ -82,6 +82,8 @@ export const Terms = () => {
     )
 }
 
+export default Terms;
+
 const Container = styled.div`
   padding: 20px;
   max-width: 600px;
