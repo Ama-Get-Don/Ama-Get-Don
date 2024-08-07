@@ -29,7 +29,8 @@ def string_to_list(string):
 extract_llm = ChatOpenAI(model="gpt-4o", temperature=0.8, openai_api_key=api_key)
 answer_llm = ChatOpenAI(model="gpt-4o", temperature=0.7, openai_api_key=api_key)
 
-def core_Chain(question, investment_level, user_info):
+# core_Chain 함수자체는 비동기로 호출한다.
+async def core_Chain(question, investment_level, user_info):
     print("체인의 input으로 들어온 question", question)
     print("체인의 input으로 들어온 유저의 정보", user_info)
 
@@ -86,7 +87,7 @@ def core_Chain(question, investment_level, user_info):
         tookie_chain3 = tookie_prompt | answer_llm | StrOutputParser()
         answer = tookie_chain3.invoke({})
 
-    print("최종질의(GPT-4):", answer)
+    print("최종질의(GPT-4o):", answer)
     return answer
 
 
