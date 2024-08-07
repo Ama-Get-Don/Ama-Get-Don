@@ -50,9 +50,9 @@ export const Terms = () => {
     
         setIsAllChecked(isTerm1Checked && isTerm2Checked && isTerm3Checked);
     }, [isTerm1Checked, isTerm2Checked, isTerm3Checked]);
-
+    
     const handleNext = () => {
-        if (isAllChecked) {
+        if (isTerm1Checked && isTerm2Checked) {
             navigate('/sign-up/info');
         }
     }
