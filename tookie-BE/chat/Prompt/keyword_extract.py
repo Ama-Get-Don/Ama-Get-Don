@@ -1,8 +1,6 @@
 # 키워드 추출하는 프롬프트
 from langchain_core.prompts import ChatPromptTemplate
-
-
-def keyword_extract(text):
+async def keyword_extract(text):
     return ChatPromptTemplate.from_template(f'''너는 [사용자의 질문] 에서 1) 투자하고자 하는 회사, 2) 주식관련 키워드를 추출하는 추출기야.
         답변을 줄때 [데이터 형식]대로 결과를 반환 해줘! 
         다른 필요없는 텍스트 붙이지 말고 오직 리스트만 반환해야해!

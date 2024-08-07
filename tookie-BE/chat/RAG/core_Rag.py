@@ -32,15 +32,12 @@ index = VectorStoreIndex.from_documents(documents, storage_context=storage_conte
 query_engine = index.as_query_engine(llm=llm)
 
 async def core_Rag(message):
-
     prompt = message
     message = f"User query:{prompt}"
-
     print(message)
-
     try:
         response = query_engine.query(message)
-        print("현재 뽑히고 있는:")
+        print("RAG 결과:", response)
     except Exception as e:
         # 문서 검색이 실패할 경우 LLM의 사전 학습된 지식을 바탕으로 응답 생성
         print("문서 검색 실패:", e)

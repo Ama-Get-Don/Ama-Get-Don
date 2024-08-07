@@ -13,7 +13,7 @@ api_key = OPENAI_API_KEY
 
 import ast
 
-def string_to_list(string):
+async def string_to_list(string):
     try:
         # ast.literal_eval을 사용하여 문자열을 평가
         result = ast.literal_eval(string)
@@ -36,27 +36,27 @@ async def core_Chain(question, investment_level, user_info):
 
     ### 1)
     # 첫 번째 질문을 처리하는 체인 생성
-    question_extract_prompt = question_extract(question)
+    question_extract_prompt = await question_extract(question)
     chain1 = question_extract_prompt | extract_llm | StrOutputParser()
 
     # 첫 체인 실행
-    q_classification = chain1.invoke({})
+    q_classification = await chain1.ainvoke({})
     print("분류된 질문:", q_classification)
 
     # 결과를 리스트로 반환
-    q_classification = string_to_list(q_classification)
+    q_classification = await string_to_list(q_classification)
 
     ### 2)
     # 두 번째 질문을 처리하는 체인 생성
-    keyword_extract_prompt = keyword_extract(q_classification[1])
+    keyword_extract_prompt = await keyword_extract(q_classification[1])
     chain2 = keyword_extract_prompt | extract_llm | StrOutputParser()
 
     # 두 번째 체인 실행 (첫 번째 질문의 리스트 중 두번째 결과(그외의 질문)를 기반으로)
-    extracted_keywords = chain2.invoke({})
+    extracted_keywords = await chain2.ainvoke({})
     print("추출된 키워드:", extracted_keywords)
 
     # 결과를 리스트로 반환
-    extracted_keywords = string_to_list(extracted_keywords)
+    extracted_keywords = await string_to_list(extracted_keywords)
 
     # 1) 빙 API로 최신뉴스 GET -> extracted_keywords[0]
     '''
@@ -75,17 +75,17 @@ async def core_Chain(question, investment_level, user_info):
     # 사용자 수준 별 다른 프롬프트 제공 (사용자에 대한 정보를 반영하여 맞춤형 답변을 준다)
     answer=""
     if investment_level == 1:
-        seed_prompt = seed(question, user_info, related_news, company_info)
+        seed_prompt = await seed(question, user_info, related_news, company_info)
         seed_chain3 = seed_prompt | answer_llm | StrOutputParser()
-        answer = seed_chain3.invoke({})
+        answer = await seed_chain3.ainvoke({})
     elif investment_level == 2:
-        sprout_prompt = sprout(question, user_info, related_news, company_info)
+        sprout_prompt = await sprout(question, user_info, related_news, company_info)
         sprout_chain3 = sprout_prompt | answer_llm | StrOutputParser()
-        answer = sprout_chain3.invoke({})
+        answer = await sprout_chain3.ainvoke({})
     elif investment_level == 3:
-        tookie_prompt = tookie(question, user_info, related_news, company_info)
+        tookie_prompt = await tookie(question, user_info, related_news, company_info)
         tookie_chain3 = tookie_prompt | answer_llm | StrOutputParser()
-        answer = tookie_chain3.invoke({})
+        answer = await tookie_chain3.ainvoke({})
 
     print("최종질의(GPT-4o):", answer)
     return answer

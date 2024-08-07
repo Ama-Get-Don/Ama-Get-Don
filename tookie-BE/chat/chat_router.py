@@ -96,11 +96,11 @@ async def stream(user_id: int):
 
                 user_chat = f"Previous summary: {history_summary}\n" + user_chat
 
-                # 1) core_Chain 함수에서 비동기 방식으로 결과 생성
-                chaining_answer = await core_Chain(user_chat, investment_level, user_info)
+                # core_Chain과 core_Rag 함수를 비동기 방식으로 동시에 실행
+                chaining_task = asyncio.create_task(core_Chain(user_chat, investment_level, user_info))
+                rag_task = asyncio.create_task(core_Rag(user_chat))
 
-                # 2) core_Rag 함수에서 비동기 방식으로 결과 생성
-                rag_answer = await core_Rag(user_chat)
+                chaining_answer, rag_answer = await asyncio.gather(chaining_task, rag_task)
 
                 # 3) core_Chain과 core_Rag의 결과를 LLM이 종합(스트리밍 형태로 전송)
                 full_response = ""
