@@ -11,7 +11,7 @@ const AppHeader: React.FC = () => {
   const navigate = useNavigate();
 
   const handleLogoClick = () => {
-    navigate('/home');
+    navigate('');
   };
 
   return (
