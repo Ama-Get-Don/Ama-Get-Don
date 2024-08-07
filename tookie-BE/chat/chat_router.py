@@ -71,12 +71,18 @@ async def stream(user_id: int):
                 user_chat = user_data['user_chat']
                 user_info = user_data['user_info']
 
-                # core_Rag 함수에서 생성된 토큰을 스트리밍 형태로 클라이언트에 전송
+                # 1) core_Chain 함수에서 비동기 방식으로 결과 생성
+
+                # 2) core_Rag 함수에서 비동기 방식으로 결과 생성
+
+                # 3) core_Chain과 core_Rag의 결과를 LLM이 종합(스트리밍 형태로 전송)
                 async for answer in core_Rag(user_chat, user_info):
                     yield f"data: {answer}\n\n"
 
-                # 전체 응답을 core_Store 함수에 전달
+                # 1)과 2)의 답을 마지막 LLM에 전달하여 async로 뽑는다.
                 full_response = ''.join([token async for token in core_Rag(user_chat, user_info)])
+
+                # 전체 응답을 core_Store 함수에 전달
                 core_Store(user_chat, full_response)
                 break  # 한 번 응답을 보낸 후 종료
             await asyncio.sleep(1)

@@ -9,8 +9,7 @@ mock_user_info = {
     "investment_ratio": "10%미만",
     "investment_period": "1년 이하",
     "income_status": "정기적 수입이 있으나, 향후 감소 또는 불안정이 예상됨",
-    "derivatives_experience": "1년 이상 3년 미만",
-    "financial_vulnerability": "해당 사항 없음"
+    "derivatives_experience": "1년 이상 3년 미만"
 }
 
 core_Chain(mock_question, investment_level, mock_user_info)

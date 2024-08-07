@@ -20,8 +20,7 @@ def tookie(text, user_info, related_news, company_info):
         {user_info.get('income_status', '')}
         6) 투자 경험
         {user_info.get('derivatives_experience', '')}
-        7) 금융소외계층 여부
-        {user_info.get('financial_vulnerability', '')}
+        
 
         [최신 뉴스]
         {related_news}
