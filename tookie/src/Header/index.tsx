@@ -2,14 +2,21 @@ import React from 'react';
 import { Layout, Menu } from 'antd';
 import { HomeOutlined, InfoCircleOutlined, PhoneOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
-import tookieLogo from '../assets/tookie_logo.png'; // 이미지 import
+import tookieLogo from '../assets/tookie_logo.png';
+import { useNavigate } from 'react-router-dom';
 
 const { Header } = Layout;
 
 const AppHeader: React.FC = () => {
+  const navigate = useNavigate();
+
+  const handleLogoClick = () => {
+    navigate('/home');
+  };
+
   return (
     <HeaderStyled>
-      <LogoWrapper>
+      <LogoWrapper onClick={handleLogoClick}>
         <LogoImage src={tookieLogo} alt="Tookie Logo" />
       </LogoWrapper>
       <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['1']}>
