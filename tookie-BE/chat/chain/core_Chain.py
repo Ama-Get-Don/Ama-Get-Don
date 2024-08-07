@@ -21,7 +21,7 @@ seed_chain3 = LLMChain(llm=answer_llm, prompt=seed(text, user_info))
 sprout_chain3 = LLMChain(llm=answer_llm, prompt=sprout(text, user_info))
 tookie_chain3 = LLMChain(llm=answer_llm, prompt=tookie(text, user_info))
 
-def core_Chain(question, user_level, user_info):
+def core_Chain(question, investment_level, user_info):
     # 첫 체인 실행
     q_classification = chain1.run({"text": question})
     print("분류된 질문", q_classification)
@@ -45,11 +45,11 @@ def core_Chain(question, user_level, user_info):
     # 3) 사용자 수준별로 다르게 질의
     # 세 번째 체인 실행 (최종 사용자 커스텀 질문)
     # 사용자 수준 별 다른 프롬프트 제공 (사용자에 대한 정보를 반영하여 맞춤형 답변을 준다)
-    if user_level == 1:
-        answer = seed_chain3.run({"text": q_classification[1], "user_info":user_info})
-    elif user_level == 2:
-        answer = sprout_chain3.run({"text": q_classification[1], "user_info":user_info})
-    elif user_level == 3:
+    if investment_level == 1:
+        answer = seed_chain3.run({"text": q_classification[1], "user_info":user_info, "related_news": related_news})
+    elif investment_level == 2:
+        answer = sprout_chain3.run({"text": q_classification[1], "user_info":user_info, "company_info":company_info})
+    elif investment_level == 3:
         answer = tookie_chain3.run({"text": q_classification[1], "user_info":user_info})
 
     print("최종질의(GPT4o)", answer)

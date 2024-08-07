@@ -12,10 +12,10 @@ from llama_index.core import StorageContext
 import chromadb
 from llama_index.vector_stores.chroma import ChromaVectorStore
 
-from chat.Multi_Turn.core_Chat import *
+from chat.Multi_Turn.core_Store import *
 
 # llm 모델 정보
-llm = OpenAI(temperature=0.8, model="gpt-4o")
+llm = OpenAI(temperature=0.5, model="gpt-4")
 # 엠베딩 모델 정보
 embed_model = OpenAIEmbedding()
 # data 디렉터리에서 문서로드

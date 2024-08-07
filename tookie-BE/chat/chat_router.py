@@ -2,12 +2,11 @@ from fastapi import APIRouter, HTTPException
 from starlette import status
 from fastapi.responses import JSONResponse, StreamingResponse
 from chat.dto.user_Message import *
-from chat.Multi_Turn.core_Chat import *
+from chat.Multi_Turn.core_Store import *
 from chat.chat_crud import *
 from fastapi import Depends
 from chat.RAG.core_Rag import *
 import asyncio
-
 router = APIRouter(
     prefix="/chat",
 )
@@ -25,7 +24,9 @@ async def create_message(message: user_Message, db: Session = Depends(get_db)): 
 
     ## 2) user_chat 추출
     user_chat = message.user_chat
-
+    
+    ## 3) 쿼리 날려서 사용자 정보 추출
+    '''
     # 관계형 DB에 쿼리 날려서 user_info 자료구조 생성 -> 사용자에 대한 정보
     user_info = get_UserInfo(db, user_id)
 
@@ -37,6 +38,19 @@ async def create_message(message: user_Message, db: Session = Depends(get_db)): 
         print("DB에서 가져온 데이터: 리스크 선호도", user_info.risk_preference)
         print("DB에서 가져온 데이터: 원하는 목표", user_info.investment_goal)
         print("DB에서 가져온 데이터: 투자기간", user_info.investment_horizon)
+    
+    '''
+    # 가자 테스팅 데이터
+    mock_user_info = {
+        "investment_goal": "예적금 수익률보다 3~5%정도 기대할 수 있다면 원금보존 가능성은 좀 포기할 수 있음",
+        "risk_tolerance" : "투자원금은 반드시 보전",
+        "investment_ratio" : "10%미만",
+        "investment_period" : "1년 이하",
+        "income_status" : "정기적 수입이 있으나, 향후 감소 또는 불안정이 예상됨",
+        "derivatives_experience" : "1년 이상 3년 미만",
+        "financial_vulnerability" : "해당 사항 없음"
+    }
+    user_info = mock_user_info
 
     backend_json[message.user_id] = {
         "user_chat": user_chat,
@@ -61,7 +75,7 @@ async def stream(user_id: int):
                 async for answer in core_Rag(user_chat, user_info):
                     yield f"data: {answer}\n\n"
 
-                # 전체 응답을 core_Chat 함수에 전달
+                # 전체 응답을 core_Store 함수에 전달
                 full_response = ''.join([token async for token in core_Rag(user_chat, user_info)])
                 core_Store(user_chat, full_response)
                 break  # 한 번 응답을 보낸 후 종료

@@ -5,7 +5,7 @@ class user_Message(BaseModel):
     user_id: int
 
     # 투자자의 수준(seed, sprout, tookie)
-    user_level: int
+    investment_level: int
 
     # 투자자가 물어본 질문
     user_chat: str
