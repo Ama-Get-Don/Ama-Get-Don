@@ -43,15 +43,15 @@ const ButtonContainer = styled.div`
   display: flex;
   gap: 20px;
   justify-content: flex-start;
-  margin-left: 100px;
-  margin-bottom: 300px;  // 버튼을 화면 하단에서 약간 띄웁니다.
+  margin-left: 240px;
+  margin-bottom: 200px;  // 버튼을 화면 하단에서 약간 띄웁니다.
 `;
 
 const StyledButton = styled(AntButton)`
-  font-size: 18px;
-  height: 40px;
-  padding: 0 30px;
+  font-size: 17px;
+  height: 50px;
+  width: 180px;
   color: black;
   background-color: white;
-  border-color: white;
+  font-weight: bold;
 `;
