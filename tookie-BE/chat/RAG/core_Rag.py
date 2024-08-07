@@ -12,8 +12,6 @@ from llama_index.core import StorageContext
 import chromadb
 from llama_index.vector_stores.chroma import ChromaVectorStore
 
-from chat.Multi_Turn.core_Store import *
-
 # llm 모델 정보
 llm = OpenAI(temperature=0.5, model="gpt-4")
 # 엠베딩 모델 정보
@@ -35,23 +33,17 @@ query_engine = index.as_query_engine(llm=llm)
 
 async def core_Rag(message):
 
-    # 이전 대화 요약
-    history_summary = summarize_history()
-    print(history_summary)
-
     prompt = message
-    # 요약된 대화 맥락과 현재 프롬프트를 결합한 쿼리 작성
-    print("현재 맥락", history_summary)
-    combined_message = f"Preveous summary: {history_summary}\nUser query:{prompt}"
+    message = f"User query:{prompt}"
 
-    print(combined_message)
+    print(message)
 
     try:
-        response = query_engine.query(combined_message)
+        response = query_engine.query(message)
         print("현재 뽑히고 있는:")
     except Exception as e:
         # 문서 검색이 실패할 경우 LLM의 사전 학습된 지식을 바탕으로 응답 생성
         print("문서 검색 실패:", e)
-        response = llm.generate(combined_message)
+        response = llm.generate(message)
 
     return response

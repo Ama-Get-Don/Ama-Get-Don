@@ -13,6 +13,8 @@ from langchain_openai import ChatOpenAI
 
 import asyncio
 
+from chat.Multi_Turn.core_Store import *
+
 llm= ChatOpenAI(
     temperature=0.1,
     model_name = "gpt-4o",
@@ -87,6 +89,12 @@ async def stream(user_id: int):
                 user_chat = user_data['user_chat']
                 user_info = user_data['user_info']
                 investment_level = user_data['investment_level']
+
+                # 이전 대화 요약
+                history_summary = summarize_history()
+                print("대화맥락:", history_summary)
+
+                user_chat = f"Previous summary: {history_summary}\n" + user_chat
 
                 # 1) core_Chain 함수에서 비동기 방식으로 결과 생성
                 chaining_answer = await core_Chain(user_chat, investment_level, user_info)
