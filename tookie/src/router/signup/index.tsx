@@ -1,7 +1,8 @@
 import { RouteObject } from "react-router-dom";
 import { Terms } from "../../pages/signup/Terms";
 import { Info } from "../../pages/signup/Info";
-import {Survey} from "../../pages/signup/Survey";
+import {KnowledgeLevelSurvey} from "../../pages/signup/KnowledgeLevelSurvey";
+import {InvestmentProfileSurvey} from "../../pages/signup/InvestmentProfileSurvey";
 import { SignUpComplete } from "../../pages/signup/SignUpComplete";
 
 const signUpRoute: RouteObject = {
@@ -16,8 +17,12 @@ const signUpRoute: RouteObject = {
             element: <Info />
         },
         {
-            path: 'survey', 
-            element: <Survey />
+            path: 'knowledge_level_survey', 
+            element: <KnowledgeLevelSurvey />
+        },
+        {
+            path: 'investment_profile_survey', 
+            element: <InvestmentProfileSurvey />
         },
         {
             path: 'complete', 

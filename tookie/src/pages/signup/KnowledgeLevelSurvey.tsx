@@ -16,7 +16,7 @@ type FormState = {
   additionalInfo: string[];
 };
 
-export const Survey = () => {
+export const KnowledgeLevelSurvey = () => {
   const [form, setForm] = useState<FormState>({
     investmentExperience: '',
     investmentTime: '',
@@ -48,7 +48,7 @@ export const Survey = () => {
   };
 
   const handleNext = () => {
-    navigate('/sign-up/complete'); 
+    navigate('/sign-up/investment_profile_survey'); 
   };
 
   return (
@@ -138,7 +138,7 @@ export const Survey = () => {
 
         <ButtonContainer>
           <Button type="primary" htmlType="submit" onClick={handleNext}>
-            확인
+            다음
           </Button>
         </ButtonContainer>
       </Form>
@@ -166,4 +166,4 @@ const ButtonContainer = styled.div`
   margin-top: 20px;
 `;
 
-export default Survey;
+export default KnowledgeLevelSurvey;
