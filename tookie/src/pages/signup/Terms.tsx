@@ -1,92 +1,182 @@
 import { styled } from "styled-components";
-import { Checkbox, Button, Typography, Space } from 'antd';
-import { useState } from "react";
-import { CheckboxChangeEvent } from "antd/es/checkbox";
+import { Button as AntButton, Typography, Space, Input } from 'antd';
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import checkedImage from '../../assets/after_check.png';
+import uncheckedImage from '../../assets/before_check.png';
 
 const { Title, Paragraph } = Typography;
+const { TextArea } = Input;
 
 export const Terms = () => {
     const [isAllChecked, setIsAllChecked] = useState(false);
     const [isTerm1Checked, setIsTerm1Checked] = useState(false);
     const [isTerm2Checked, setIsTerm2Checked] = useState(false);
     const [isTerm3Checked, setIsTerm3Checked] = useState(false);
-
+    const [isButtonEnabled, setIsButtonEnabled] = useState(false);
+    
     const navigate = useNavigate();
 
-    const handleAllCheckChange = (e: CheckboxChangeEvent) => {
-        const checked = e.target.checked;
-        setIsAllChecked(checked);
-        setIsTerm1Checked(checked);
-        setIsTerm2Checked(checked);
-        setIsTerm3Checked(checked);
+    const handleAllCheckChange = () => {
+        const newCheckedStatus = !isAllChecked;
+        setIsAllChecked(newCheckedStatus);
+        setIsTerm1Checked(newCheckedStatus);
+        setIsTerm2Checked(newCheckedStatus);
+        setIsTerm3Checked(newCheckedStatus);
     };
-
-    const handleTermChange = () => {
-        setIsAllChecked(isTerm1Checked && isTerm2Checked);
+    
+    const handleTermChange = (term: string) => {
+        let newTerm1Checked = isTerm1Checked;
+        let newTerm2Checked = isTerm2Checked;
+        let newTerm3Checked = isTerm3Checked;
+    
+        if (term === 'term1') {
+            newTerm1Checked = !isTerm1Checked;
+            setIsTerm1Checked(newTerm1Checked);
+        } else if (term === 'term2') {
+            newTerm2Checked = !isTerm2Checked;
+            setIsTerm2Checked(newTerm2Checked);
+        } else if (term === 'term3') {
+            newTerm3Checked = !isTerm3Checked;
+            setIsTerm3Checked(newTerm3Checked);
+        }
+    
+        const allChecked = newTerm1Checked && newTerm2Checked && newTerm3Checked;
+        setIsAllChecked(allChecked);
     };
-
+    
+    useEffect(() => {
+        setIsButtonEnabled(isTerm1Checked && isTerm2Checked);
+    
+        setIsAllChecked(isTerm1Checked && isTerm2Checked && isTerm3Checked);
+    }, [isTerm1Checked, isTerm2Checked, isTerm3Checked]);
+    
     const handleNext = () => {
-        if (isAllChecked) {
-            navigate('/sign-up/info'); // '/next' 경로로 이동
+        if (isTerm1Checked && isTerm2Checked) {
+            navigate('/sign-up/info');
         }
     }
 
     return (
         <Container>
             <Title level={2}>이용약관</Title>
-            <Paragraph>
-                이용약관에 대한 내용을 아래에서 확인하고 동의해주세요.
-            </Paragraph>
             <Space direction="vertical" size="large">
-                <Checkbox
-                    checked={isAllChecked}
-                    onChange={handleAllCheckChange}
+                <div
+                    onClick={handleAllCheckChange} 
+                    style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
                 >
-                    전체 동의하기
-                </Checkbox>
-                <Checkbox
-                    checked={isTerm1Checked}
-                    onChange={(e) => {
-                        setIsTerm1Checked(e.target.checked);
-                        handleTermChange();
-                    }}
-                >
-                    [필수] 이용약관
+                    <img 
+                        src={isAllChecked ? checkedImage : uncheckedImage} 
+                        alt="checkbox" 
+                        style={{ width: '20px', marginRight: '8px' }} 
+                    />
+                    <span style={{ fontWeight: 'bold', fontSize: '1.1rem'}}>전체 동의하기</span>
+                </div>
+                <Paragraph style={{ marginLeft: '23px', marginTop: '-15px', color: '#929292' }}>
+                    이벤트 · 혜택 정보 수신(선택) 동의를 포함합니다.
+                </Paragraph>
+                
+                <TermItem>
+                    <div 
+                        onClick={() => handleTermChange('term1')} 
+                        style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+                    >
+                        <img src={isTerm1Checked ? checkedImage : uncheckedImage} alt="checkbox" style={{ width: '20px', marginRight: '8px' }} />
+                        <span>
+                            <span style={{ color: '#00A868' }}>[필수]</span> 이용약관
+                        </span>
+                    </div>
+                    <TextArea
+                        value="서비스 이용약관이 들어갑니다. 내용은 추후 수정될 예정입니다."
+                        autoSize={{ minRows: 3, maxRows: 5 }}
+                        readOnly
+                    />
+                </TermItem>
 
-                </Checkbox>
+                <TermItem>
+                    <div
+                        onClick={() => handleTermChange('term2')} 
+                        style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+                    >
+                        <img src={isTerm2Checked ? checkedImage : uncheckedImage} alt="checkbox" style={{ width: '20px', marginRight: '8px' }} />
+                        <span>
+                            <span style={{ color: '#00A868' }}>[필수]</span> 개인정보 수집 및 이용
+                        </span>
+                    </div>
+                    <TextArea
+                        value="개인정보보호법에 따라 안내 드리오니 자세히 읽은 후 동의하여 주시기 바랍니다."
+                        autoSize={{ minRows: 3, maxRows: 5 }}
+                        readOnly
+                    />
+                </TermItem>
 
-                <Checkbox
-                    checked={isTerm2Checked}
-                    onChange={(e) => {
-                        setIsTerm2Checked(e.target.checked);
-                        handleTermChange();
-                    }}
-                >
-                    [필수] 개인정보 수집 및 이용
-                </Checkbox>
-                <Checkbox
-                    checked={isTerm3Checked}
-                    onChange={(e: CheckboxChangeEvent) => {
-                        setIsTerm3Checked(e.target.checked);
-                        handleTermChange();
-                    }}
-                >
-                    [선택 약관]
-                </Checkbox>
-                <Button type="primary" disabled={!isAllChecked} onClick={handleNext}>
-                    동의하고 다음으로
-                </Button>
+                <TermItem>
+                    <div
+                        onClick={() => handleTermChange('term3')} 
+                        style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+                    >
+                        <img src={isTerm3Checked ? checkedImage : uncheckedImage} alt="checkbox" style={{ width: '20px', marginRight: '8px' }} />
+                        <span>
+                        <span style={{ color: '#929292' }}>[선택]</span> 개인정보 수집 및 이용
+                        </span>
+                    </div>
+                    <Paragraph style={{ marginLeft: '23px', color: '#929292' }}>
+                        이벤트 : 혜택 정보 수신
+                    </Paragraph>
+                </TermItem>
+                <StyledButton type="primary" shape="round" disabled={!isButtonEnabled} onClick={handleNext}>
+                    다음
+                </StyledButton>
             </Space>
         </Container>
-    )
+    );
 }
 
 export default Terms;
 
 const Container = styled.div`
-  padding: 20px;
-  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 90vh;
+  max-width: 500px;
   margin: 0 auto;
-  background-color: #ffffff;
+  background-color: white;
+`;
+
+const TermItem = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 800px;
+`;
+
+const StyledButton = styled(AntButton)`
+    &&& {
+    width: 100%;
+    height: 40px;
+    background-color: #00D282;
+    border-color: #00D282;
+    color: white;
+    border: none;
+
+    &:hover, &:focus {
+      background-color: #00B870;
+      border-color: #00B870;
+      color: white;
+    }
+
+    &:active {
+      background-color: #009A5E;
+      border-color: #009A5E;
+    }
+
+    &:disabled {
+      background-color: #ccc;
+      color: white;
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+  }
 `;
