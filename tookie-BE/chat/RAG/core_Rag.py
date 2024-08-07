@@ -31,9 +31,9 @@ storage_context = StorageContext.from_defaults(vector_store = vector_store)
 index = VectorStoreIndex.from_documents(documents, storage_context=storage_context, embed_model = embed_model)
 
 # 쿼리엔진 생성
-query_engine = index.as_query_engine(streaming=True, llm=llm) # 스트리밍으로 반환하도록 설정
+query_engine = index.as_query_engine(llm=llm)
 
-async def core_Rag(message, user_info):
+async def core_Rag(message):
 
     # 이전 대화 요약
     history_summary = summarize_history()
@@ -47,26 +47,11 @@ async def core_Rag(message, user_info):
     print(combined_message)
 
     try:
-        streaming_response = query_engine.query(combined_message)
+        response = query_engine.query(combined_message)
         print("현재 뽑히고 있는:")
-        for text in streaming_response.response_gen:
-            yield text
     except Exception as e:
         # 문서 검색이 실패할 경우 LLM의 사전 학습된 지식을 바탕으로 응답 생성
         print("문서 검색 실패:", e)
-        fallback_response = llm.generate(combined_message)
-        yield fallback_response
+        response = llm.generate(combined_message)
 
-
-
-'''
-# 문서를 노드 단위로 분할
-pipeline = IngestionPipeline(transformations=[TokenTextSplitter(), ...])
-nodes = pipeline.run(documents=documents)
-
-# 메타 데이터 추가
-document = Document(
-    text="text",
-    metadata={"filename": "<doc_file_name>", "category": "<category>"},
-)
-'''
+    return response

@@ -5,8 +5,19 @@ from chat.dto.user_Message import *
 from chat.Multi_Turn.core_Store import *
 from chat.chat_crud import *
 from fastapi import Depends
+
+from chat.Chain.core_Chain import *
 from chat.RAG.core_Rag import *
+
+from langchain_openai import ChatOpenAI
+
 import asyncio
+
+llm= ChatOpenAI(
+    temperature=0.1,
+    model_name = "gpt-4o",
+)
+
 router = APIRouter(
     prefix="/chat",
 )
@@ -24,6 +35,9 @@ async def create_message(message: user_Message, db: Session = Depends(get_db)): 
 
     ## 2) user_chat 추출
     user_chat = message.user_chat
+
+    ## 3) investment_level 추출
+    investment_level = message.investment_level
     
     ## 3) 쿼리 날려서 사용자 정보 추출
     '''
@@ -54,7 +68,8 @@ async def create_message(message: user_Message, db: Session = Depends(get_db)): 
 
     backend_json[message.user_id] = {
         "user_chat": user_chat,
-        "user_info": user_info
+        "user_info": user_info,
+        "investment_level":investment_level
     }
 
     return JSONResponse(content={"status": "ok"}, media_type="application/json; charset=utf-8")
@@ -68,19 +83,22 @@ async def stream(user_id: int):
         while True:
             if user_id in backend_json:
                 user_data = backend_json.pop(user_id)
+
                 user_chat = user_data['user_chat']
                 user_info = user_data['user_info']
+                investment_level = user_data['investment_level']
 
                 # 1) core_Chain 함수에서 비동기 방식으로 결과 생성
+                chaining_answer = await core_Chain(user_chat, investment_level, user_info)
 
                 # 2) core_Rag 함수에서 비동기 방식으로 결과 생성
+                rag_answer = await core_Rag(user_chat)
 
                 # 3) core_Chain과 core_Rag의 결과를 LLM이 종합(스트리밍 형태로 전송)
-                async for answer in core_Rag(user_chat, user_info):
-                    yield f"data: {answer}\n\n"
-
-                # 1)과 2)의 답을 마지막 LLM에 전달하여 async로 뽑는다.
-                full_response = ''.join([token async for token in core_Rag(user_chat, user_info)])
+                full_response = ""
+                for llm_token in llm.stream(f"{chaining_answer}의 결과와 {rag_answer}의 결과를 종합해주세요!"):
+                    yield f"data: {llm_token.content}\n\n"
+                    full_response += llm_token.content
 
                 # 전체 응답을 core_Store 함수에 전달
                 core_Store(user_chat, full_response)
