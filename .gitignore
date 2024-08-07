@@ -8,3 +8,5 @@ tookie-BE/data/
 new_chroma_db/
 venv/
 alembic.ini
+.env
+*.sql

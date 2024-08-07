@@ -12,10 +12,10 @@ from llama_index.core import StorageContext
 import chromadb
 from llama_index.vector_stores.chroma import ChromaVectorStore
 
-from chat.Multi_Turn.core_Chat import *
+from chat.Multi_Turn.core_Store import *
 
 # llm 모델 정보
-llm = OpenAI(temperature=0.2, model="gpt-4")
+llm = OpenAI(temperature=0.5, model="gpt-4")
 # 엠베딩 모델 정보
 embed_model = OpenAIEmbedding()
 # data 디렉터리에서 문서로드
@@ -39,26 +39,24 @@ async def core_Rag(message, user_info):
     history_summary = summarize_history()
     print(history_summary)
 
-    # 사용자 수준 별 다른 프롬프트 제공 (사용자에 대한 정보를 반영하여 맞춤형 답변을 준다)
-    '''
-    if user_info["level"] == 1:
-        prompt = seed(message, user_info)
-    elif user_info["level"] == 2:
-        prompt = sprout(message, user_info)
-    elif user_info["level"] == 3:
-        prompt = tooki(message, user_info)
-    '''
     prompt = message
     # 요약된 대화 맥락과 현재 프롬프트를 결합한 쿼리 작성
     print("현재 맥락", history_summary)
     combined_message = f"Preveous summary: {history_summary}\nUser query:{prompt}"
 
+    print(combined_message)
 
-    streaming_response = query_engine.query(combined_message)
+    try:
+        streaming_response = query_engine.query(combined_message)
+        print("현재 뽑히고 있는:")
+        for text in streaming_response.response_gen:
+            yield text
+    except Exception as e:
+        # 문서 검색이 실패할 경우 LLM의 사전 학습된 지식을 바탕으로 응답 생성
+        print("문서 검색 실패:", e)
+        fallback_response = llm.generate(combined_message)
+        yield fallback_response
 
-    print("현재 뽑히고 있는:")
-    for text in streaming_response.response_gen:
-        yield text
 
 
 '''
