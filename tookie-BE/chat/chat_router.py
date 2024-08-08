@@ -5,8 +5,21 @@ from chat.dto.user_Message import *
 from chat.Multi_Turn.core_Store import *
 from chat.chat_crud import *
 from fastapi import Depends
+
+from chat.Chain.core_Chain import *
 from chat.RAG.core_Rag import *
+
+from langchain_openai import ChatOpenAI
+
 import asyncio
+
+from chat.Multi_Turn.core_Store import *
+
+llm= ChatOpenAI(
+    temperature=0.1,
+    model_name = "gpt-4o",
+)
+
 router = APIRouter(
     prefix="/chat",
 )
@@ -24,6 +37,9 @@ async def create_message(message: user_Message, db: Session = Depends(get_db)): 
 
     ## 2) user_chat 추출
     user_chat = message.user_chat
+
+    ## 3) investment_level 추출
+    investment_level = message.investment_level
     
     ## 3) 쿼리 날려서 사용자 정보 추출
     '''
@@ -54,7 +70,8 @@ async def create_message(message: user_Message, db: Session = Depends(get_db)): 
 
     backend_json[message.user_id] = {
         "user_chat": user_chat,
-        "user_info": user_info
+        "user_info": user_info,
+        "investment_level":investment_level
     }
 
     return JSONResponse(content={"status": "ok"}, media_type="application/json; charset=utf-8")
@@ -68,15 +85,30 @@ async def stream(user_id: int):
         while True:
             if user_id in backend_json:
                 user_data = backend_json.pop(user_id)
+
                 user_chat = user_data['user_chat']
                 user_info = user_data['user_info']
+                investment_level = user_data['investment_level']
 
-                # core_Rag 함수에서 생성된 토큰을 스트리밍 형태로 클라이언트에 전송
-                async for answer in core_Rag(user_chat, user_info):
-                    yield f"data: {answer}\n\n"
+                # 이전 대화 요약
+                history_summary = summarize_history()
+                print("대화맥락:", history_summary)
+
+                user_chat = f"Previous summary: {history_summary}\n" + user_chat
+
+                # core_Chain과 core_Rag 함수를 비동기 방식으로 동시에 실행
+                chaining_task = asyncio.create_task(core_Chain(user_chat, investment_level, user_info))
+                rag_task = asyncio.create_task(core_Rag(user_chat))
+
+                chaining_answer, rag_answer = await asyncio.gather(chaining_task, rag_task)
+
+                # 3) core_Chain과 core_Rag의 결과를 LLM이 종합(스트리밍 형태로 전송)
+                full_response = ""
+                for llm_token in llm.stream(f"{chaining_answer}의 결과와 {rag_answer}의 결과를 종합해주세요!"):
+                    yield f"data: {llm_token.content}\n\n"
+                    full_response += llm_token.content
 
                 # 전체 응답을 core_Store 함수에 전달
-                full_response = ''.join([token async for token in core_Rag(user_chat, user_info)])
                 core_Store(user_chat, full_response)
                 break  # 한 번 응답을 보낸 후 종료
             await asyncio.sleep(1)

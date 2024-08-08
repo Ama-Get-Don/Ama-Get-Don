@@ -34,10 +34,6 @@ class DerivativesExperience(PyEnum):
     LESS_THAN_1_YEAR = "1년 미만"
     BETWEEN_1_AND_3_YEARS = "1년 이상 3년 미만"
     MORE_THAN_3_YEARS = "3년 이상"
-
-class FinancialVulnerability(PyEnum):
-    VULNERABLE = "금융투자상품에 대한 이해가 부족하거나 투자 경험이 없음"
-    NOT_VULNERABLE = "해당 사항 없음"
 class Gender(PyEnum):
     MALE = "Male"
     FEMALE = "Female"
@@ -73,7 +69,5 @@ class InvestmentPreference(Base):
     income_status = Column(Enum(IncomeStatus), nullable=False)
     # 질문 6
     derivatives_experience = Column(Enum(DerivativesExperience), nullable=False)
-    # 질문 7
-    financial_vulnerability = Column(Enum(FinancialVulnerability), nullable=False)
 
     user = relationship("User", back_populates="investments")

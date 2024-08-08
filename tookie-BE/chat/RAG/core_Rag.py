@@ -12,8 +12,6 @@ from llama_index.core import StorageContext
 import chromadb
 from llama_index.vector_stores.chroma import ChromaVectorStore
 
-from chat.Multi_Turn.core_Store import *
-
 # llm 모델 정보
 llm = OpenAI(temperature=0.5, model="gpt-4")
 # 엠베딩 모델 정보
@@ -31,42 +29,18 @@ storage_context = StorageContext.from_defaults(vector_store = vector_store)
 index = VectorStoreIndex.from_documents(documents, storage_context=storage_context, embed_model = embed_model)
 
 # 쿼리엔진 생성
-query_engine = index.as_query_engine(streaming=True, llm=llm) # 스트리밍으로 반환하도록 설정
+query_engine = index.as_query_engine(llm=llm)
 
-async def core_Rag(message, user_info):
-
-    # 이전 대화 요약
-    history_summary = summarize_history()
-    print(history_summary)
-
+async def core_Rag(message):
     prompt = message
-    # 요약된 대화 맥락과 현재 프롬프트를 결합한 쿼리 작성
-    print("현재 맥락", history_summary)
-    combined_message = f"Preveous summary: {history_summary}\nUser query:{prompt}"
-
-    print(combined_message)
-
+    message = f"User query:{prompt}"
+    print(message)
     try:
-        streaming_response = query_engine.query(combined_message)
-        print("현재 뽑히고 있는:")
-        for text in streaming_response.response_gen:
-            yield text
+        response = query_engine.query(message)
+        print("RAG 결과:", response)
     except Exception as e:
         # 문서 검색이 실패할 경우 LLM의 사전 학습된 지식을 바탕으로 응답 생성
         print("문서 검색 실패:", e)
-        fallback_response = llm.generate(combined_message)
-        yield fallback_response
+        response = llm.generate(message)
 
-
-
-'''
-# 문서를 노드 단위로 분할
-pipeline = IngestionPipeline(transformations=[TokenTextSplitter(), ...])
-nodes = pipeline.run(documents=documents)
-
-# 메타 데이터 추가
-document = Document(
-    text="text",
-    metadata={"filename": "<doc_file_name>", "category": "<category>"},
-)
-'''
+    return response

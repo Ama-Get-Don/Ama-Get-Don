@@ -1,8 +1,6 @@
 # 질문 2개 추출하는 프롬프트
 from langchain_core.prompts import ChatPromptTemplate
-
-
-def question_extract(text):
+async def question_extract(text):
     return ChatPromptTemplate.from_template(f'''
         너는 [사용자의 질문] 에서 1) 투자 법률과 규제 관련 질문과 2) 그외의 질문으로 나누어 추출하는 추출기야.
         답변을 줄때 [데이터 형식]대로 결과를 반환 해줘! 
