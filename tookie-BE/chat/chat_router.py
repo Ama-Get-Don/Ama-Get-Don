@@ -6,7 +6,7 @@ from chat.Multi_Turn.core_Store import *
 from chat.chat_crud import *
 from fastapi import Depends
 
-from chat.Chain.core_Chain import *
+from chat.chain.core_Chain import *
 from chat.RAG.core_Rag import *
 
 from langchain_openai import ChatOpenAI
