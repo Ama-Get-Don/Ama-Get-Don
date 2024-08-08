@@ -27,14 +27,14 @@ export const Chat = () => {
 
     useEffect(() => {
         // 추천 질문 랜덤으로 선택
-        const getRandomQuestions = (questions: Question[]) => {
-            return questions.sort(() => 0.5 - Math.random()).slice(0, 3);
+        const getRandomQuestions = (questions: Question[], num: number) => {
+            return questions.sort(() => 0.5 - Math.random()).slice(0, num);
         };
 
         setRecommendedQuestions([
-            ...getRandomQuestions(beginnerQuestions),
-            ...getRandomQuestions(intermediateQuestions),
-            ...getRandomQuestions(advancedQuestions),
+            ...getRandomQuestions(beginnerQuestions, 1),
+            ...getRandomQuestions(intermediateQuestions, 1),
+            ...getRandomQuestions(advancedQuestions, 1),
         ]);
     }, []);
 
