@@ -1,19 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Input, Layout, List, Avatar } from 'antd';
 import styled from 'styled-components';
-import sendButtonDark from '/src/assets/sendButtonDark.png'; 
-import sendButtonLight from '/src/assets/sendButtonLight.png'; 
+import sendButtonDark from '/src/assets/sendButtonDark.png';
+import sendButtonLight from '/src/assets/sendButtonLight.png';
+import { beginnerQuestions, intermediateQuestions, advancedQuestions, Question } from './questions';
 
 const { Content } = Layout;
 const { TextArea } = Input;
 
-const initialMessages: Message[] = [
-    {
-        id: 1,
-        sender: 'bot',
-        content: '안녕하세요! 무엇을 도와드릴까요?',
-    },
-];
+const initialMessages: Message[] = [];
 
 interface Message {
     id: number;
@@ -27,6 +22,21 @@ export const Chat = () => {
     const [eventSource, setEventSource] = useState<EventSource | null>(null);
     const [partialMessage, setPartialMessage] = useState<string>('');
     const [isChatEnd, setIsChatEnd] = useState(false);
+    const [showWelcomeScreen, setShowWelcomeScreen] = useState(true); // 추가된 상태
+    const [recommendedQuestions, setRecommendedQuestions] = useState<Question[]>([]);
+
+    useEffect(() => {
+        // 추천 질문 랜덤으로 선택
+        const getRandomQuestions = (questions: Question[]) => {
+            return questions.sort(() => 0.5 - Math.random()).slice(0, 3);
+        };
+
+        setRecommendedQuestions([
+            ...getRandomQuestions(beginnerQuestions),
+            ...getRandomQuestions(intermediateQuestions),
+            ...getRandomQuestions(advancedQuestions),
+        ]);
+    }, []);
 
     useEffect(() => {
         // 컴포넌트 언마운트 시 SSE 연결 종료
@@ -55,6 +65,8 @@ export const Chat = () => {
 
     const handleSend = async () => {
         if (input.trim()) {
+            setShowWelcomeScreen(false); // 환영 화면 숨기기
+
             const userMessage: Message = {
                 id: messages.length + 1,
                 sender: 'user',
@@ -114,23 +126,59 @@ export const Chat = () => {
         };
     };
 
+    const handleStartChat = (question: Question) => {
+        setShowWelcomeScreen(false); // 환영 화면 숨기기
+
+        const userMessage: Message = {
+            id: messages.length + 1,
+            sender: 'user',
+            content: question.content,
+        };
+
+        const botMessage: Message = {
+            id: messages.length + 2,
+            sender: 'bot',
+            content: question.response,
+        };
+
+        setMessages((prevMessages) => [...prevMessages, userMessage, botMessage]);
+    };
+
     return (
         <Content style={{ padding: '20px 50px', height: '100vh' }}>
             <Container>
                 <ChatContainer>
-                    <List
-                        dataSource={messages}
-                        renderItem={(item) => (
-                            <MessageItem key={item.id} sender={item.sender}>
-                                <MessageContent sender={item.sender}>
-                                    <Avatar>{item.sender === 'bot' ? 'B' : 'U'}</Avatar>
-                                    <MessageBubble sender={item.sender}>
-                                        {item.content}
-                                    </MessageBubble>
-                                </MessageContent>
-                            </MessageItem>
-                        )}
-                    />
+                    {showWelcomeScreen ? (
+                        <WelcomeScreen>
+                            <WelcomeContent>
+                                <AvatarWrapper>
+                                    <AvatarIcon />
+                                </AvatarWrapper>
+                                <WelcomeMessage>주식 관련 메시지를 입력하시거나, 아래 추천 질문을 클릭해주세요.</WelcomeMessage>
+                                <ButtonWrapper>
+                                    {recommendedQuestions.map((question) => (
+                                        <QuestionButton key={question.id} onClick={() => handleStartChat(question)}>
+                                            {question.content}
+                                        </QuestionButton>
+                                    ))}
+                                </ButtonWrapper>
+                            </WelcomeContent>
+                        </WelcomeScreen>
+                    ) : (
+                        <List
+                            dataSource={messages}
+                            renderItem={(item) => (
+                                <MessageItem key={item.id} sender={item.sender}>
+                                    <MessageContent sender={item.sender}>
+                                        <Avatar>{item.sender === 'bot' ? 'B' : 'U'}</Avatar>
+                                        <MessageBubble sender={item.sender}>
+                                            {item.content}
+                                        </MessageBubble>
+                                    </MessageContent>
+                                </MessageItem>
+                            )}
+                        />
+                    )}
                 </ChatContainer>
                 <InputWrapper>
                     <InputContainer>
@@ -157,7 +205,6 @@ const Container = styled.div`
     padding: 50px;
     max-width: 1000px;
     margin: 0 auto; 
-
 `;
 
 const ChatContainer = styled.div`
@@ -167,6 +214,53 @@ const ChatContainer = styled.div`
     border: 1px solid #ddd;
     border-radius: 10px;
     margin-bottom: 20px;
+`;
+
+const WelcomeScreen = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+`;
+
+const WelcomeContent = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+`;
+
+const AvatarWrapper = styled.div`
+    margin-bottom: 20px;
+`;
+
+const AvatarIcon = styled.div`
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: #f5f5f5;
+`;
+
+const WelcomeMessage = styled.div`
+    font-size: 18px;
+    margin-bottom: 20px;
+`;
+
+const ButtonWrapper = styled.div`
+    display: flex;
+    gap: 10px;
+`;
+
+const QuestionButton = styled.button`
+    background-color: #e5f5e5;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+
+    &:hover {
+        background-color: #d4e4d4;
+    }
 `;
 
 const InputWrapper = styled.div`
