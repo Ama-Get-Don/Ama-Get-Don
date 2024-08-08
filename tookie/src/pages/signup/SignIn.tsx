@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Col, Row, Input, Space } from "antd";
+import { Button, Col, Row, Input, Space, message } from "antd";
 import styled from "styled-components";
 import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
@@ -10,14 +10,43 @@ export const SignIn = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleChat = () => {
-    if (username && password) {
-      navigate('/chat');
+  const handleLogin = async () => {
+    if (!username || !password) {
+      message.error("아이디와 비밀번호를 입력해주세요");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch('http://localhost:5000/api/user/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          username: username,
+          password: password,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem('token', data.access_token);
+        message.success('로그인 성공!');
+        navigate('/chat');
+      } else {
+        message.error('로그인 실패: 잘못된 아이디나 비밀번호입니다.');
+      }
+    } catch (error) {
+      console.error('로그인 요청 중 오류 발생:', error);
+      message.error('로그인 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
     }
   };
-
-  const isLoginDisabled = !username || !password;
 
   return (
     <Container>
@@ -40,10 +69,10 @@ export const SignIn = () => {
       <StyledButton 
         type="primary" 
         shape="round" 
-        onClick={handleChat}
-        disabled={isLoginDisabled}
+        onClick={handleLogin}
+        disabled={!username || !password || loading}
       >
-        로그인
+        {loading ? '로그인 중...' : '로그인'}
       </StyledButton>
       <Row>
         <Col>비밀번호 찾기</Col>
@@ -51,8 +80,8 @@ export const SignIn = () => {
         <Col>아이디 찾기</Col>
       </Row>
     </Container>
-  )
-}
+  );
+};
 
 const LogoImage = styled.img`
   width: 200px;
