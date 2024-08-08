@@ -34,9 +34,10 @@ class DerivativesExperience(PyEnum):
     LESS_THAN_1_YEAR = "1년 미만"
     BETWEEN_1_AND_3_YEARS = "1년 이상 3년 미만"
     MORE_THAN_3_YEARS = "3년 이상"
+
 class Gender(PyEnum):
-    MALE = "Male"
-    FEMALE = "Female"
+    남자 = "남자"
+    여자 = "여자"
 
 class User(Base):
     __tablename__ = 'users'
@@ -44,10 +45,11 @@ class User(Base):
     user_id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(50), unique=True, nullable=False)
     email = Column(String(100), unique=True, nullable=False)
-    phone_number = Column(String(100), nullable=True)
+    phone_number = Column(String(100), nullable=False)
     password = Column(String(100), nullable=False)
     join_date = Column(DateTime, default=datetime.datetime.utcnow)
-    gender = Column(Enum(Gender), nullable=True)
+    gender = Column(Enum(Gender), nullable=False)
+    birthdate = Column(String, nullable=False)  
     investment_level = Column(Integer, nullable=True)
 
     investments = relationship("InvestmentPreference", back_populates="user")

@@ -9,7 +9,7 @@ class UserCreate(BaseModel):
     name: str
     password: str
     email: EmailStr
-    birthdate: str  # 생년월일
+    birthdate: str  
     phone_number: str
     gender: GenderEnum
 
