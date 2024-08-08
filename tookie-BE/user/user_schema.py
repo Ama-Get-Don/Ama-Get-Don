@@ -2,8 +2,8 @@ from pydantic import BaseModel, EmailStr, validator
 from enum import Enum
 
 class GenderEnum(str, Enum):
-    남자 = "남자"
-    여자 = "여자"
+    남자 = "Male"
+    여자 = "Female"
 
 class UserCreate(BaseModel):
     name: str
