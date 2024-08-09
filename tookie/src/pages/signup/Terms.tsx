@@ -173,7 +173,7 @@ const StyledButton = styled(AntButton)`
     }
 
     &:disabled {
-      background-color: #ccc;
+      background-color: #929292;
       color: white;
       opacity: 0.7;
       cursor: not-allowed;
