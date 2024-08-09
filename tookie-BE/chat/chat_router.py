@@ -42,19 +42,12 @@ async def create_message(message: user_Message, db: Session = Depends(get_db)): 
     investment_level = message.investment_level
     
     ## 3) 쿼리 날려서 사용자 정보 추출
-    '''
     # 관계형 DB에 쿼리 날려서 user_info 자료구조 생성 -> 사용자에 대한 정보
     user_info = get_UserInfo(db, user_id)
 
     if not user_info:
         return {"message": "No user info found for the given user_id"}
-    else:
-        print("DB에서 가져온 데이터: 선호테이블 id", user_info.preference_id)
-        print("DB에서 가져온 데이터: 유저 id(FK)", user_info.user_id)
-        print("DB에서 가져온 데이터: 리스크 선호도", user_info.risk_preference)
-        print("DB에서 가져온 데이터: 원하는 목표", user_info.investment_goal)
-        print("DB에서 가져온 데이터: 투자기간", user_info.investment_horizon)
-    
+
     '''
     # 테스팅 데이터
     mock_user_info = {
@@ -66,7 +59,7 @@ async def create_message(message: user_Message, db: Session = Depends(get_db)): 
         "derivatives_experience" : "1년 이상 3년 미만",
         "financial_vulnerability" : "해당 사항 없음"
     }
-    user_info = mock_user_info
+    '''
 
     backend_json[message.user_id] = {
         "user_chat": user_chat,
