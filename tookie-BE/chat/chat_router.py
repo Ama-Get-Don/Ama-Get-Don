@@ -87,10 +87,10 @@ async def stream(user_id: int):
                 history_summary = summarize_history()
                 print("대화맥락:", history_summary)
 
-                user_chat = f"Previous Question and Answer Summary: {history_summary}\n Present User Question: {user_chat}"
+                new_user_chat = f"Previous Question and Answer Summary[{history_summary}]\n\n\n Present User Question: {user_chat}"
 
                 # core_Chain 비동기 방식으로 실행
-                rag_answer, agent_answer, company_answer = await core_Chain(user_chat, investment_level, user_info)
+                rag_answer, agent_answer, company_answer = await core_Chain(new_user_chat, investment_level, user_info)
 
                 # 3) core_Chain의 결과를 LLM이 종합(스트리밍 형태로 전송)
                 full_response = ""
@@ -99,7 +99,7 @@ async def stream(user_id: int):
                     full_response += llm_token.content
 
                 # 전체 응답을 core_Store 함수에 전달
-                core_Store(user_chat, full_response)
+                core_Store(new_user_chat.replace("Previous Question and Answer Summary", "").replace("Present User Question:", ""), full_response)
                 break  # 한 번 응답을 보낸 후 종료
             await asyncio.sleep(1)
 
