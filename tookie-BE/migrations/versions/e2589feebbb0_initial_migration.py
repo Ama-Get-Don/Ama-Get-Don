@@ -1,8 +1,8 @@
-"""empty message
+"""Initial migration
 
-Revision ID: db995f906e09
-Revises: 
-Create Date: 2024-08-03 10:45:08.760147
+Revision ID: e2589feebbb0
+Revises: 50742ead1006
+Create Date: 2024-08-09 06:21:28.219883
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'db995f906e09'
-down_revision: Union[str, None] = None
+revision: str = 'e2589feebbb0'
+down_revision: Union[str, None] = '50742ead1006'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -24,8 +24,12 @@ def upgrade() -> None:
     sa.Column('user_id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(length=50), nullable=False),
     sa.Column('email', sa.String(length=100), nullable=False),
+    sa.Column('phone_number', sa.String(length=20), nullable=True),
     sa.Column('password', sa.String(length=100), nullable=False),
     sa.Column('join_date', sa.DateTime(), nullable=True),
+    sa.Column('gender', sa.Enum('MALE', 'FEMALE', name='gender'), nullable=True),
+    sa.Column('birthdate', sa.String(length=10), nullable=True),
+    sa.Column('investment_level', sa.Integer(), nullable=True),
     sa.PrimaryKeyConstraint('user_id'),
     sa.UniqueConstraint('email'),
     sa.UniqueConstraint('name')
@@ -33,9 +37,12 @@ def upgrade() -> None:
     op.create_table('investment_preferences',
     sa.Column('preference_id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.Column('risk_preference', sa.Enum('LOW', 'MEDIUM', 'HIGH', name='riskpreference'), nullable=False),
-    sa.Column('investment_goal', sa.String(length=100), nullable=True),
-    sa.Column('investment_horizon', sa.Enum('SHORT_TERM', 'MEDIUM_TERM', 'LONG_TERM', name='investmenthorizon'), nullable=False),
+    sa.Column('investment_goal', sa.Enum('LOW', 'MEDIUM', 'HIGH', name='investmentgoal'), nullable=False),
+    sa.Column('risk_tolerance', sa.Enum('NO_LOSS', 'SOME_LOSS', 'HIGH_LOSS', name='risktolerance'), nullable=False),
+    sa.Column('investment_ratio', sa.Enum('LESS_THAN_10', 'BETWEEN_10_AND_30', 'MORE_THAN_30', name='investmentratio'), nullable=False),
+    sa.Column('investment_period', sa.Enum('LESS_THAN_1_YEAR', 'BETWEEN_1_AND_5_YEARS', 'MORE_THAN_5_YEARS', name='investmentperiod'), nullable=False),
+    sa.Column('income_status', sa.Enum('STABLE', 'UNSTABLE', 'NO_INCOME', name='incomestatus'), nullable=False),
+    sa.Column('derivatives_experience', sa.Enum('LESS_THAN_1_YEAR', 'BETWEEN_1_AND_3_YEARS', 'MORE_THAN_3_YEARS', name='derivativesexperience'), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['users.user_id'], ),
     sa.PrimaryKeyConstraint('preference_id')
     )

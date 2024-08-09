@@ -2,6 +2,17 @@ import { Form, Input, DatePicker, Button as AntButton } from "antd";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { useState } from "react";
+import moment from "moment";  // DatePicker의 값 처리를 위해 moment를 import
+
+interface FormValues {
+    username: string;
+    password: string;
+    email: string;
+    name: string;
+    birthdate: moment.Moment;  // DatePicker에서 반환되는 값의 타입은 moment 객체입니다.
+    phone: string;
+    gender: 'Male' | 'Female';  // gender 값을 명확히 지정
+}
 
 export const Info: React.FC = () => {
     const [form] = Form.useForm();
@@ -9,15 +20,45 @@ export const Info: React.FC = () => {
     const [selectedGender, setSelectedGender] = useState<'male' | 'female' | null>(null);
     const [isButtonEnabled, setIsButtonEnabled] = useState(false);
 
-    const handleFinish = (values: any) => {
-        console.log('Form Values: ', values);
-        navigate('/sign-up/knowledge_level_survey');
+    const handleFinish = async (values: FormValues) => {  // values의 타입을 명확하게 정의
+        const genderMap = {
+            Male: "Male",
+            Female: "Female"
+        };
+        
+        const requestData = {
+            username: values.username,
+            password: values.password,
+            email: values.email,
+            name: values.name,
+            birthdate: values.birthdate.format('YYYY-MM-DD'),  // DatePicker의 값 형식화
+            phone_number: values.phone,
+            gender: genderMap[values.gender]
+        };
+
+        try {
+            const response = await fetch('http://127.0.0.1:5000/api/user/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestData),
+            });
+
+            if (response.status === 204) {
+                console.log("User created successfully");
+                navigate('/sign-up/knowledge_level_survey');
+            } else {
+                console.error("Failed to create user:", response.status);
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        }
     };
 
-    const handleGenderSelect = (gender: 'male' | 'female') => {
-        setSelectedGender(gender);
+    const handleGenderSelect = (gender: 'Male' | 'Female') => {  // 대문자로 수정
+        setSelectedGender(gender.toLowerCase() as 'male' | 'female');  // 상태 업데이트에 맞게 처리
         form.setFieldsValue({ gender });
-
         setIsButtonEnabled(true);
     };
 
@@ -70,31 +111,31 @@ export const Info: React.FC = () => {
                         name="gender"
                         rules={[{ required: true, message: '성별을 선택해주세요' }]}
                     >
-                            <GenderButton
-                                onClick={() => handleGenderSelect('male')}
-                                $isSelected={selectedGender === 'male'}
-                                type="default"
-                                style={{ marginRight: '10px', height: '35px', width: '70px' }}
-                            >
-                                남성
-                            </GenderButton>
-                            <GenderButton
-                                onClick={() => handleGenderSelect('female')}
-                                $isSelected={selectedGender === 'female'}
-                                type="default"
-                                style={{ marginRight: '10px', height: '35px', width: '70px' }}
-                            >
-                                여성
-                            </GenderButton>
-                    </Form.Item>        
+                        <GenderButton
+                            onClick={() => handleGenderSelect('Male')}
+                            $isSelected={selectedGender === 'male'}
+                            type="default"
+                            style={{ marginRight: '10px', height: '35px', width: '70px' }}
+                        >
+                            남성
+                        </GenderButton>
+                        <GenderButton
+                            onClick={() => handleGenderSelect('Female')}
+                            $isSelected={selectedGender === 'female'}
+                            type="default"
+                            style={{ marginRight: '10px', height: '35px', width: '70px' }}
+                        >
+                            여성
+                        </GenderButton>
+                    </Form.Item>
                     <Spacer />
                     <Form.Item>
                         <ButtonContainer>
                             <SubmitButton
-                            type="primary"
-                            shape="round"
-                            disabled={!isButtonEnabled}
-                            htmlType="submit"
+                                type="primary"
+                                shape="round"
+                                disabled={!isButtonEnabled}
+                                htmlType="submit"
                             >
                                 다음
                             </SubmitButton>
@@ -107,6 +148,7 @@ export const Info: React.FC = () => {
 };
 
 export default Info;
+
 
 const Container = styled.div`
     display: flex;

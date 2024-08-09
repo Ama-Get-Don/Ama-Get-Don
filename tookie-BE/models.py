@@ -1,5 +1,4 @@
-# models.py
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Enum
+from sqlalchemy import Column, Integer, String, DateTime, Enum, ForeignKey  # ForeignKey 추가
 from sqlalchemy.orm import relationship
 from database import Base
 from enum import Enum as PyEnum
@@ -34,6 +33,7 @@ class DerivativesExperience(PyEnum):
     LESS_THAN_1_YEAR = "1년 미만"
     BETWEEN_1_AND_3_YEARS = "1년 이상 3년 미만"
     MORE_THAN_3_YEARS = "3년 이상"
+
 class Gender(PyEnum):
     MALE = "Male"
     FEMALE = "Female"
@@ -44,10 +44,11 @@ class User(Base):
     user_id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(50), unique=True, nullable=False)
     email = Column(String(100), unique=True, nullable=False)
-    phone_number = Column(String(100), nullable=True)
+    phone_number = Column(String(20), nullable=True)  # 길이 지정
     password = Column(String(100), nullable=False)
     join_date = Column(DateTime, default=datetime.datetime.utcnow)
     gender = Column(Enum(Gender), nullable=True)
+    birthdate = Column(String(10), nullable=True)  # 길이 지정
     investment_level = Column(Integer, nullable=True)
 
     investments = relationship("InvestmentPreference", back_populates="user")
@@ -56,18 +57,11 @@ class InvestmentPreference(Base):
     __tablename__ = 'investment_preferences'
     preference_id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('users.user_id'), nullable=False)
-
-    # 질문1
     investment_goal = Column(Enum(InvestmentGoal), nullable=False)
-    # 질문2
     risk_tolerance = Column(Enum(RiskTolerance), nullable=False)
-    # 질문3
     investment_ratio = Column(Enum(InvestmentRatio), nullable=False)
-    # 질문 4
     investment_period = Column(Enum(InvestmentPeriod), nullable=False)
-    # 질문 5
     income_status = Column(Enum(IncomeStatus), nullable=False)
-    # 질문 6
     derivatives_experience = Column(Enum(DerivativesExperience), nullable=False)
 
     user = relationship("User", back_populates="investments")

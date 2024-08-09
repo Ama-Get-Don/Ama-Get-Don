@@ -1,29 +1,23 @@
 from datetime import timedelta, datetime
-
-from fastapi import APIRouter, HTTPException
-from fastapi import Depends
+from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from starlette import status
 from fastapi.security import OAuth2PasswordRequestForm
 from jose import jwt
-from config.config import *
 
+from config.config import *
 from database import get_db
 from user import user_crud, user_schema
 from user.user_crud import pwd_context
 from user.settings import SECRET_KEY
 
-
-#JWT 설정
+# JWT 설정
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
-SECRET_KEY = SECRET_KEY
 ALGORITHM = "HS256"
-
 
 router = APIRouter(
     prefix="/api/user",
 )
-
 
 @router.post("/create", status_code=status.HTTP_204_NO_CONTENT)
 def user_create(_user_create: user_schema.UserCreate, db: Session = Depends(get_db)):
@@ -37,16 +31,16 @@ def user_create(_user_create: user_schema.UserCreate, db: Session = Depends(get_
 def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(),
                            db: Session = Depends(get_db)):
 
-    # check user and password
+    # 사용자와 비밀번호 확인
     user = user_crud.get_user(db, form_data.username)
     if not user or not pwd_context.verify(form_data.password, user.password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
+            detail="사용자 이름 또는 비밀번호가 올바르지 않습니다",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    # make access token
+    # 액세스 토큰 생성
     data = {
         "sub": user.name,
         "exp": datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
