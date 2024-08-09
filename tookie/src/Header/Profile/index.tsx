@@ -62,9 +62,6 @@ const Profile: React.FC = () => {
             <GrowthImage src={tookieImage} alt="투기" />
           </div>
           <Button type="primary" style={{ margin: '10px' }}>
-            프로필 사진 변경하기
-          </Button>
-          <Button type="primary" style={{ margin: '10px' }}>
             성장 단계 직접 변경하기
           </Button>
         </StyledModalContent>
@@ -88,11 +85,11 @@ const StyledMenu = styled(Menu)`
 
 const StyledMenuItem = styled(Menu.Item)`
     &:hover {
-      background-color: #00D282; // 호버 시 배경색 변경
+      background-color: #00D282;
     }
 
     .ant-dropdown-menu-item-icon {
-      color: white; // 아이콘 색상 변경
+      color: white;
     }
   }
 `;
