@@ -10,3 +10,5 @@ venv/
 alembic.ini
 .env
 *.sql
+financial_statements/
+alembic/
