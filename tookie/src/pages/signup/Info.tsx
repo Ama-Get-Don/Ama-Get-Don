@@ -207,7 +207,7 @@ const SubmitButton = styled(AntButton)`
     }
 
     &&:disabled {
-        background-color: #ccc;
+        background-color: #929292;
         opacity: 0.7;
         cursor: not-allowed;
     }
