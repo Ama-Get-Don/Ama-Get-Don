@@ -60,16 +60,16 @@ class InvestmentPreference(Base):
     user_id = Column(Integer, ForeignKey('users.user_id'), nullable=False)
 
     # 질문1
-    investment_goal = Column(Enum(InvestmentGoal), nullable=False)
+    investment_goal = Column(String(200), nullable=False)
     # 질문2
-    risk_tolerance = Column(Enum(RiskTolerance), nullable=False)
+    risk_tolerance = Column(String(200), nullable=False)
     # 질문3
-    investment_ratio = Column(Enum(InvestmentRatio), nullable=False)
+    investment_ratio = Column(String(200), nullable=False)
     # 질문 4
-    investment_period = Column(Enum(InvestmentPeriod), nullable=False)
+    investment_period = Column(String(200), nullable=False)
     # 질문 5
-    income_status = Column(Enum(IncomeStatus), nullable=False)
+    income_status = Column(String(200), nullable=False)
     # 질문 6
-    derivatives_experience = Column(Enum(DerivativesExperience), nullable=False)
+    derivatives_experience = Column(String(200), nullable=False)
 
     user = relationship("User", back_populates="investments")

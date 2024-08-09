@@ -3,7 +3,6 @@ from pydantic import BaseModel, EmailStr, field_validator
 from pydantic_core.core_schema import FieldValidationInfo
 import datetime
 
-
 class UserCreate(BaseModel):
     tookie_id : str
     name: str
@@ -31,14 +30,15 @@ class UserCreate(BaseModel):
         from_attributes = True
 
 class InvestmentPreferenceCreate(BaseModel):
-    user_id : str
+
+    user_id : int
     investment_goal: str
     risk_tolerance: str
     investment_ratio: str
     investment_period: str
     income_status: str
-    derivatives_experience:str
-    @field_validator('user_id', 'investment_goal', 'risk_tolerance', 'investment_ratio', 'investment_period', 'income_status', 'derivatives_experience')
+    derivatives_experience: str
+    @field_validator('investment_goal', 'risk_tolerance', 'investment_ratio', 'investment_period', 'income_status', 'derivatives_experience')
     def not_empty(cls, v):
         if not v or not v.strip():
             raise ValueError('빈 값은 허용되지 않습니다.')
