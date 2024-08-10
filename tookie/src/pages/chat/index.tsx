@@ -17,6 +17,142 @@ interface Message {
     content: string;
 }
 
+const Container = styled.div`
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 50px;
+    max-width: 1000px;
+    margin: 0 auto; 
+`;
+
+const ChatContainer = styled.div`
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    margin-bottom: 20px;
+`;
+
+const WelcomeScreen = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+`;
+
+const WelcomeContent = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+`;
+
+const AvatarWrapper = styled.div`
+    margin-bottom: 20px;
+`;
+
+const AvatarIcon = styled.div`
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: #f5f5f5;
+`;
+
+const WelcomeMessage = styled.div`
+    font-size: 18px;
+    margin-bottom: 20px;
+`;
+
+const ButtonWrapper = styled.div`
+    display: flex;
+    gap: 10px;
+`;
+
+const QuestionButton = styled.button`
+    background-color: #e5f5e5;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+
+    &:hover {
+        background-color: #d4e4d4;
+    }
+`;
+
+const InputWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+`;
+
+const InputContainer = styled.div`
+    display: flex;
+    align-items: center;
+    max-width: 1300px; 
+    width: 100%;
+    border-radius: 20px;
+    border: 1px solid #ddd;
+    background-color: #f5f5f5;
+    padding: 10px;
+`;
+
+const StyledTextArea = styled(TextArea)`
+    flex: 1;
+    border-radius: 20px;
+    border: none;
+    background-color: #f5f5f5;
+    padding: 10px;
+    resize: none;
+    margin-right: 10px; 
+    overflow: hidden; 
+`;
+
+const StyledButton = styled.button`
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    background-image: url(${sendButtonLight});
+    background-size: cover;
+
+    &:hover {
+        background-image: url(${sendButtonDark});
+    }
+`;
+
+const FooterText = styled.div`
+    text-align: center;
+    margin-top: 10px;
+    color: #888;
+    font-size: 12px;
+`;
+
+const MessageItem = styled.div<{ sender: 'user' | 'bot' }>`
+    display: flex;
+    justify-content: ${props => (props.sender === 'user' ? 'flex-end' : 'flex-start')};
+    margin-bottom: 10px;
+`;
+
+const MessageContent = styled.div<{ sender: 'user' | 'bot' }>`
+    display: flex;
+    align-items: flex-start;
+    flex-direction: ${props => (props.sender === 'user' ? 'row-reverse' : 'row')};
+`;
+
+const MessageBubble = styled.div<{ sender: 'user' | 'bot' }>`
+    max-width: 100%;
+    background-color: ${props => (props.sender === 'user' ? '#d4f7dc' : '#f1f0f0')};
+    color: ${props => (props.sender === 'user' ? '#000' : '#000')};
+    padding: 20px;
+    border-radius: 10px;
+    margin: 0 10px;
+`;
+
 export const Chat = () => {
     const { user_create, user_id } = useGlobalState(); 
     const [messages, setMessages] = useState<Message[]>(initialMessages);
@@ -32,12 +168,19 @@ export const Chat = () => {
             return questions.sort(() => 0.5 - Math.random()).slice(0, num);
         };
 
-        setRecommendedQuestions([
-            ...getRandomQuestions(beginnerQuestions, 1),
-            ...getRandomQuestions(intermediateQuestions, 1),
-            ...getRandomQuestions(advancedQuestions, 1),
-        ]);
-    }, []);
+        // investment_level에 따른 추천 질문 설정
+        let selectedQuestions: Question[] = [];
+
+        if (user_create.investment_level === 1) {
+            selectedQuestions = getRandomQuestions(beginnerQuestions, 3);
+        } else if (user_create.investment_level === 2) {
+            selectedQuestions = getRandomQuestions(intermediateQuestions, 3);
+        } else if (user_create.investment_level === 3) {
+            selectedQuestions = getRandomQuestions(advancedQuestions, 3);
+        }
+
+        setRecommendedQuestions(selectedQuestions);
+    }, [user_create.investment_level]);
 
     useEffect(() => {
         return () => {
@@ -201,139 +344,3 @@ export const Chat = () => {
         </Content>
     );
 }
-
-const Container = styled.div`
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    padding: 50px;
-    max-width: 1000px;
-    margin: 0 auto; 
-`;
-
-const ChatContainer = styled.div`
-    flex: 1;
-    overflow-y: auto;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    margin-bottom: 20px;
-`;
-
-const WelcomeScreen = styled.div`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-`;
-
-const WelcomeContent = styled.div`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-`;
-
-const AvatarWrapper = styled.div`
-    margin-bottom: 20px;
-`;
-
-const AvatarIcon = styled.div`
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    background-color: #f5f5f5;
-`;
-
-const WelcomeMessage = styled.div`
-    font-size: 18px;
-    margin-bottom: 20px;
-`;
-
-const ButtonWrapper = styled.div`
-    display: flex;
-    gap: 10px;
-`;
-
-const QuestionButton = styled.button`
-    background-color: #e5f5e5;
-    border: none;
-    border-radius: 5px;
-    padding: 10px 20px;
-    cursor: pointer;
-
-    &:hover {
-        background-color: #d4e4d4;
-    }
-`;
-
-const InputWrapper = styled.div`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-`;
-
-const InputContainer = styled.div`
-    display: flex;
-    align-items: center;
-    max-width: 1300px; 
-    width: 100%;
-    border-radius: 20px;
-    border: 1px solid #ddd;
-    background-color: #f5f5f5;
-    padding: 10px;
-`;
-
-const StyledTextArea = styled(TextArea)`
-    flex: 1;
-    border-radius: 20px;
-    border: none;
-    background-color: #f5f5f5;
-    padding: 10px;
-    resize: none;
-    margin-right: 10px; 
-    overflow: hidden; 
-`;
-
-const StyledButton = styled.button`
-    background: none;
-    border: none;
-    cursor: pointer;
-    width: 40px;
-    height: 40px;
-    background-image: url(${sendButtonLight});
-    background-size: cover;
-
-    &:hover {
-        background-image: url(${sendButtonDark});
-    }
-`;
-
-const FooterText = styled.div`
-    text-align: center;
-    margin-top: 10px;
-    color: #888;
-    font-size: 12px;
-`;
-
-const MessageItem = styled.div<{ sender: 'user' | 'bot' }>`
-    display: flex;
-    justify-content: ${props => (props.sender === 'user' ? 'flex-end' : 'flex-start')};
-    margin-bottom: 10px;
-`;
-
-const MessageContent = styled.div<{ sender: 'user' | 'bot' }>`
-    display: flex;
-    align-items: flex-start;
-    flex-direction: ${props => (props.sender === 'user' ? 'row-reverse' : 'row')};
-`;
-
-const MessageBubble = styled.div<{ sender: 'user' | 'bot' }>`
-    max-width: 100%;
-    background-color: ${props => (props.sender === 'user' ? '#d4f7dc' : '#f1f0f0')};
-    color: ${props => (props.sender === 'user' ? '#000' : '#000')};
-    padding: 20px;
-    border-radius: 10px;
-    margin: 0 10px;
-`;

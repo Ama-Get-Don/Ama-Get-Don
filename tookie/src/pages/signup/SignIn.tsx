@@ -37,8 +37,8 @@ export const SignIn = () => {
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem('token', data.access_token);
-        localStorage.setItem('user_id', data.user_id); // user_id 저장
-        setGlobalState(prev => ({ ...prev, user_id: data.user_id })); // 전역 상태에 user_id 설정
+        localStorage.setItem('user_id', data.user_id); 
+        setGlobalState(prev => ({ ...prev, user_id: data.user_id })); 
         message.success('로그인 성공!');
         navigate('/chat');
       } else {
