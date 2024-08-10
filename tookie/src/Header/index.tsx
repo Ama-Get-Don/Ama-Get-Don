@@ -15,7 +15,7 @@ const AppHeader: React.FC = () => {
     navigate('');
   };
 
-  const isLoggedIn = location.pathname.includes('/chat'); // chat 경로에 있을 때만 로그인된 것으로 간주
+  const isLoggedIn = location.pathname.includes('/chat');
 
   return (
     <HeaderStyled>

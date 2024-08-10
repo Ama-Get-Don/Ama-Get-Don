@@ -14,7 +14,7 @@ const Profile: React.FC = () => {
 
   const handleMenuClick = (e: { key: string }) => {
     if (e.key === 'myInfo') {
-      setModalVisible(true); // 모달 열기
+      setModalVisible(true);
     } else if (e.key === 'logout') {
       navigate('/');
     }
@@ -61,6 +61,9 @@ const Profile: React.FC = () => {
             <span>→</span>
             <GrowthImage src={tookieImage} alt="투기" />
           </div>
+          <Button type="primary" style={{ margin: '10px' }}>
+            프로필 사진 변경하기
+          </Button>
           <Button type="primary" style={{ margin: '10px' }}>
             성장 단계 직접 변경하기
           </Button>

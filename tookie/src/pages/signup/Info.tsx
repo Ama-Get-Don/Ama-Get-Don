@@ -117,7 +117,7 @@ const Container = styled.div`
 `;
 
 const Spacer = styled.div`
-    height: 30px; // 원하는 공간 크기
+    height: 30px;
 `;
 
 const FormWrapper = styled.div`
