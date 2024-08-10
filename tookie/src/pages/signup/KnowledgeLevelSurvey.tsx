@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Button, Checkbox, Form, Select } from 'antd';
 import { CheckboxChangeEvent } from 'antd/es/checkbox';
-import { styled } from 'styled-components';
+import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import { useGlobalState } from '../../GlobalState.tsx';
 
 const { Option } = Select;
 
@@ -23,6 +24,7 @@ type FormState = {
 };
 
 export const KnowledgeLevelSurvey = () => {
+  const { setGlobalState } = useGlobalState();
   const [form, setForm] = useState<FormState>({
     investmentExperience: '',
     investmentTime: '',
@@ -92,25 +94,26 @@ export const KnowledgeLevelSurvey = () => {
     return totalScore;
   };
   
-  const determineLevel = () => {
-    const interestAreasWeight = calculateInterestAreasWeight();
-    const additionalInfoWeight = calculateAdditionalInfoWeight();
+  const determineLevel = (): number => {
     const totalScore = calculateTotalScore();
   
-    console.log("Interest Areas Weight:", interestAreasWeight);
-    console.log("Additional Info Weight:", additionalInfoWeight);
-    console.log("Total Score:", totalScore);
-  
-    if (totalScore <= 2.0) return "씨앗";
-    if (totalScore <= 3.0) return "새순";
-    return "투키";
+    if (totalScore <= 2.0) return 1; // 씨앗
+    if (totalScore <= 3.0) return 2; // 새순
+    return 3; // 투키
   };
   
-
   const handleNext = () => {
     const level = determineLevel();
-    console.log("Your investment knowledge level is: ", level);
-    navigate('/sign-up/investment_profile_survey'); 
+  
+    setGlobalState(prev => ({
+      ...prev,
+      user_create: {
+        ...prev.user_create,
+        investment_level: level // 투자 지식 수준을 숫자로 업데이트
+      }
+    }));
+  
+    navigate('/sign-up/investment_profile_survey');
   };
 
   return (

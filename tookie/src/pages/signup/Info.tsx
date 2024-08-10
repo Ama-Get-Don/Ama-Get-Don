@@ -2,38 +2,51 @@ import { Form, Input, DatePicker, Button as AntButton } from "antd";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { useState } from "react";
+import { useGlobalState } from '../../GlobalState.tsx';
 
 
 
-interface FormValues {
-    username: string;
-    password: string;
-    email: string;
-    name: string;
-    birthdate: moment.Moment; 
-    phone: string;
-    gender: 'male' | 'female';
-}
-
-
+    interface FormValues {
+        username: string;
+        password: string;
+        email: string;
+        name: string;
+        birthdate: moment.Moment; // 날짜는 Moment 객체를 사용하고 있으므로, 이를 반영
+        phone: string;
+        gender: 'male' | 'female';
+    }
 
 export const Info: React.FC = () => {
+    const { setGlobalState } = useGlobalState();
     const [form] = Form.useForm();
     const navigate = useNavigate();
     const [selectedGender, setSelectedGender] = useState<'male' | 'female' | null>(null);
     const [isButtonEnabled, setIsButtonEnabled] = useState(false);
 
-
-    const handleFinish = (values: FormValues) => {
-        console.log('Form Values: ', values);
-        navigate('/sign-up/knowledge_level_survey');
-    };
-
     const handleGenderSelect = (gender: 'male' | 'female') => {
         setSelectedGender(gender);
         form.setFieldsValue({ gender });
 
+        // 선택된 성별에 따라 버튼을 활성화할지 결정
         setIsButtonEnabled(true);
+    };
+
+    const handleFinish = (values: FormValues) => {
+    setGlobalState(prev => ({
+        ...prev,
+        user_create: {
+        ...prev.user_create,
+        tookie_id: values.username,
+        name: values.name,
+        password1: values.password,
+        password2: values.password,
+        email: values.email,
+        phone_number: values.phone,
+        birth: values.birthdate.format('YYYY-MM-DD'),
+        gender: values.gender
+        }
+    }));
+    navigate('/sign-up/knowledge_level_survey');
     };
 
     return (
@@ -122,7 +135,6 @@ export const Info: React.FC = () => {
 };
 
 export default Info;
-
 
 const Container = styled.div`
     display: flex;
