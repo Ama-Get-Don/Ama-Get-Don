@@ -6,7 +6,7 @@
 
 ### 사용자 흐름 (User Flow)
 
-주요 단계는 다음과 같습니다:
+주요 단계는 다음과 같습니다.
 
 ![User Flow](readme_images/user_flow.png)
 
@@ -41,7 +41,7 @@
 
 ### UI 화면 
 
-다음은 주요 인터페이스의 화면입니다:
+다음은 주요 인터페이스의 화면입니다.
 
 1. **메인 페이지**: ![Main Page](readme_images/main.png)
    - 로그인 또는 회원가입 옵션이 있는 메인 랜딩 페이지
