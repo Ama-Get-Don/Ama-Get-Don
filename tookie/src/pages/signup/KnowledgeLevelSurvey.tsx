@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect  } from 'react';
 import { Button, Checkbox, Form, Select } from 'antd';
 import { CheckboxChangeEvent } from 'antd/es/checkbox';
 import styled from 'styled-components';
@@ -24,7 +24,7 @@ type FormState = {
 };
 
 export const KnowledgeLevelSurvey = () => {
-  const { setGlobalState } = useGlobalState();
+  const { setGlobalState, ...globalState } = useGlobalState(); 
   const [form, setForm] = useState<FormState>({
     investmentExperience: '',
     investmentTime: '',
@@ -36,6 +36,10 @@ export const KnowledgeLevelSurvey = () => {
   });
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    console.log("Global State after update: ", globalState);
+  }, [globalState]);
 
   const handleChange = (name: keyof FormState, value: string) => {
     setForm({
@@ -101,9 +105,10 @@ export const KnowledgeLevelSurvey = () => {
     if (totalScore <= 3.0) return 2; // 새순
     return 3; // 투키
   };
-  
+
   const handleNext = () => {
     const level = determineLevel();
+    console.log("Calculated Investment Level: ", level);
   
     setGlobalState(prev => ({
       ...prev,
@@ -112,7 +117,7 @@ export const KnowledgeLevelSurvey = () => {
         investment_level: level // 투자 지식 수준을 숫자로 업데이트
       }
     }));
-  
+
     navigate('/sign-up/investment_profile_survey');
   };
 

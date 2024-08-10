@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import sendButtonDark from '/src/assets/sendButtonDark.png';
 import sendButtonLight from '/src/assets/sendButtonLight.png';
 import { beginnerQuestions, intermediateQuestions, advancedQuestions, Question } from './questions';
+import { useGlobalState } from '../../GlobalState.tsx'; 
 
 const { Content } = Layout;
 const { TextArea } = Input;
@@ -17,16 +18,16 @@ interface Message {
 }
 
 export const Chat = () => {
+    const { user_create, user_id } = useGlobalState(); 
     const [messages, setMessages] = useState<Message[]>(initialMessages);
     const [input, setInput] = useState('');
     const [eventSource, setEventSource] = useState<EventSource | null>(null);
     const [partialMessage, setPartialMessage] = useState<string>('');
     const [isChatEnd, setIsChatEnd] = useState(false);
-    const [showWelcomeScreen, setShowWelcomeScreen] = useState(true); // 추가된 상태
+    const [showWelcomeScreen, setShowWelcomeScreen] = useState(true);
     const [recommendedQuestions, setRecommendedQuestions] = useState<Question[]>([]);
 
     useEffect(() => {
-        // 추천 질문 랜덤으로 선택
         const getRandomQuestions = (questions: Question[], num: number) => {
             return questions.sort(() => 0.5 - Math.random()).slice(0, num);
         };
@@ -39,7 +40,6 @@ export const Chat = () => {
     }, []);
 
     useEffect(() => {
-        // 컴포넌트 언마운트 시 SSE 연결 종료
         return () => {
             if (eventSource) {
                 eventSource.close();
@@ -48,10 +48,8 @@ export const Chat = () => {
     }, [eventSource]);
 
     useEffect(() => {
-        // partialMessage가 업데이트되고 비어 있을 때, 전체 메시지를 목록에 추가
         if (!isChatEnd) return;
 
-        // 전체 메시지로 봇 메시지 생성
         const botMessage: Message = {
             id: messages.length + 1,
             sender: 'bot',
@@ -59,13 +57,13 @@ export const Chat = () => {
         };
 
         setMessages((prevMessages) => [...prevMessages, botMessage]);
-        setPartialMessage(''); // 메시지 목록에 추가 후 partialMessage 초기화
+        setPartialMessage('');
         setIsChatEnd(false);
     }, [isChatEnd]);
 
     const handleSend = async () => {
         if (input.trim()) {
-            setShowWelcomeScreen(false); // 환영 화면 숨기기
+            setShowWelcomeScreen(false);
 
             const userMessage: Message = {
                 id: messages.length + 1,
@@ -75,23 +73,26 @@ export const Chat = () => {
             setMessages([...messages, userMessage]);
             setInput('');
 
-            // 사용자 메시지를 백엔드로 전송
+            if (!user_id) {
+                console.error('User ID가 없습니다. 로그인을 확인해주세요.');
+                return;
+            }
+
             try {
-                const response = await fetch('http://172.30.1.92:3000/chat', {
+                const response = await fetch('http://172.16.1.197:3000/chat', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json; charset=utf-8',
                         'Accept': 'application/json; charset=utf-8',
                     },
                     body: JSON.stringify({
-                        user_id: 1,
-                        investment_level: 1,
+                        user_id: user_id,
+                        investment_level: user_create.investment_level,
                         user_chat: input,
                     }),
                 });
 
                 if (response.ok) {
-                    // POST 요청이 성공하면 SSE에 연결
                     connectSSE();
                 } else {
                     console.error('메시지 전송 실패:', response.status);
@@ -102,32 +103,8 @@ export const Chat = () => {
         }
     };
 
-    const connectSSE = () => {
-        if (eventSource) {
-            eventSource.close();
-        }
-
-        const source = new EventSource('http://172.30.1.92:3000/chat/stream/1');
-        setEventSource(source);
-
-        source.onmessage = (event) => {
-            const data = event.data.trim();
-            // 수신된 데이터 조각을 partialMessage에 추가
-            setPartialMessage((prev) => prev + " " + data);
-            // 데이터 조각이 비어 있으면 메시지의 끝을 나타냄
-            if (data === '') {
-                setIsChatEnd(true);
-            }
-        };
-
-        source.onerror = (error) => {
-            console.error('EventSource 오류:', error);
-            source.close();
-        };
-    };
-
     const handleStartChat = (question: Question) => {
-        setShowWelcomeScreen(false); // 환영 화면 숨기기
+        setShowWelcomeScreen(false);
 
         const userMessage: Message = {
             id: messages.length + 1,
@@ -142,6 +119,33 @@ export const Chat = () => {
         };
 
         setMessages((prevMessages) => [...prevMessages, userMessage, botMessage]);
+    };
+
+    const connectSSE = () => {
+        if (eventSource) {
+            eventSource.close();
+        }
+
+        if (!user_id) {
+            console.error('User ID가 없습니다. 로그인을 확인해주세요.');
+            return;
+        }
+
+        const source = new EventSource(`http://172.16.1.197:3000/chat/stream/${user_id}`);
+        setEventSource(source);
+
+        source.onmessage = (event) => {
+            const data = event.data.trim();
+            setPartialMessage((prev) => prev + " " + data);
+            if (data === '') {
+                setIsChatEnd(true);
+            }
+        };
+
+        source.onerror = (error) => {
+            console.error('EventSource 오류:', error);
+            source.close();
+        };
     };
 
     return (
