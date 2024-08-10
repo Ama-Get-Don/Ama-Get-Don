@@ -45,8 +45,37 @@ export const InvestmentProfileSurvey = () => {
     }));
   };
 
-  const handleNext = () => {
-    navigate('/sign-up/complete');
+  const handleNext = async () => {
+    const payload = {
+      investmentPreference_create: {
+        user_id: 0,  
+        investment_goal: form.investmentGoal,
+        risk_tolerance: form.lossTolerance,
+        investment_ratio: form.riskPercentage,
+        investment_period: form.investmentPeriod,
+        income_status: form.profitExpectation,
+        derivatives_experience: form.investmentKnowledge,
+      }
+    };
+  
+    try {
+      const response = await fetch('/api/saveInvestmentProfile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+  
+      if (response.ok) {
+        console.log('Data saved successfully');
+        navigate('/sign-up/complete');
+      } else {
+        console.error('Failed to save data');
+      }
+    } catch (error) {
+      console.error('Error saving data:', error);
+    }
   };
 
   return (
