@@ -42,21 +42,14 @@ async def create_message(message: user_Message, db: Session = Depends(get_db)): 
     investment_level = message.investment_level
     
     ## 3) 쿼리 날려서 사용자 정보 추출
-    '''
     # 관계형 DB에 쿼리 날려서 user_info 자료구조 생성 -> 사용자에 대한 정보
     user_info = get_UserInfo(db, user_id)
 
     if not user_info:
         return {"message": "No user info found for the given user_id"}
-    else:
-        print("DB에서 가져온 데이터: 선호테이블 id", user_info.preference_id)
-        print("DB에서 가져온 데이터: 유저 id(FK)", user_info.user_id)
-        print("DB에서 가져온 데이터: 리스크 선호도", user_info.risk_preference)
-        print("DB에서 가져온 데이터: 원하는 목표", user_info.investment_goal)
-        print("DB에서 가져온 데이터: 투자기간", user_info.investment_horizon)
-    
+
     '''
-    # 가자 테스팅 데이터
+    # 테스팅 데이터
     mock_user_info = {
         "investment_goal": "예적금 수익률보다 3~5%정도 기대할 수 있다면 원금보존 가능성은 좀 포기할 수 있음",
         "risk_tolerance" : "투자원금은 반드시 보전",
@@ -66,7 +59,7 @@ async def create_message(message: user_Message, db: Session = Depends(get_db)): 
         "derivatives_experience" : "1년 이상 3년 미만",
         "financial_vulnerability" : "해당 사항 없음"
     }
-    user_info = mock_user_info
+    '''
 
     backend_json[message.user_id] = {
         "user_chat": user_chat,
@@ -94,22 +87,19 @@ async def stream(user_id: int):
                 history_summary = summarize_history()
                 print("대화맥락:", history_summary)
 
-                user_chat = f"Previous summary: {history_summary}\n" + user_chat
+                new_user_chat = f"Previous Question and Answer Summary[{history_summary}]\n\n\n Present User Question: {user_chat}"
 
-                # core_Chain과 core_Rag 함수를 비동기 방식으로 동시에 실행
-                chaining_task = asyncio.create_task(core_Chain(user_chat, investment_level, user_info))
-                rag_task = asyncio.create_task(core_Rag(user_chat))
+                # core_Chain 비동기 방식으로 실행
+                rag_answer, agent_answer, company_answer = await core_Chain(new_user_chat, investment_level, user_info)
 
-                chaining_answer, rag_answer = await asyncio.gather(chaining_task, rag_task)
-
-                # 3) core_Chain과 core_Rag의 결과를 LLM이 종합(스트리밍 형태로 전송)
+                # 3) core_Chain의 결과를 LLM이 종합(스트리밍 형태로 전송)
                 full_response = ""
-                for llm_token in llm.stream(f"{chaining_answer}의 결과와 {rag_answer}의 결과를 종합해주세요!"):
+                for llm_token in llm.stream(f"{rag_answer}와\n{agent_answer}와\n{company_answer}의 내용을 종합해주세요!"):
                     yield f"data: {llm_token.content}\n\n"
                     full_response += llm_token.content
 
                 # 전체 응답을 core_Store 함수에 전달
-                core_Store(user_chat, full_response)
+                core_Store(new_user_chat.replace("Previous Question and Answer Summary", "").replace("Present User Question:", ""), full_response)
                 break  # 한 번 응답을 보낸 후 종료
             await asyncio.sleep(1)
 

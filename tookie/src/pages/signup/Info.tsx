@@ -3,13 +3,28 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { useState } from "react";
 
+
+
+interface FormValues {
+    username: string;
+    password: string;
+    email: string;
+    name: string;
+    birthdate: moment.Moment; 
+    phone: string;
+    gender: 'male' | 'female';
+}
+
+
+
 export const Info: React.FC = () => {
     const [form] = Form.useForm();
     const navigate = useNavigate();
     const [selectedGender, setSelectedGender] = useState<'male' | 'female' | null>(null);
     const [isButtonEnabled, setIsButtonEnabled] = useState(false);
 
-    const handleFinish = (values: any) => {
+
+    const handleFinish = (values: FormValues) => {
         console.log('Form Values: ', values);
         navigate('/sign-up/knowledge_level_survey');
     };
@@ -108,6 +123,7 @@ export const Info: React.FC = () => {
 
 export default Info;
 
+
 const Container = styled.div`
     display: flex;
     justify-content: center;
@@ -165,7 +181,7 @@ const SubmitButton = styled(AntButton)`
     }
 
     &&:disabled {
-        background-color: #ccc;
+        background-color: #929292;
         opacity: 0.7;
         cursor: not-allowed;
     }

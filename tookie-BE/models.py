@@ -42,11 +42,13 @@ class User(Base):
     __tablename__ = 'users'
     
     user_id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(50), unique=True, nullable=False)
+    tookie_id = Column(String(50), unique=True, nullable=False)
+    name = Column(String(50), nullable=False)
     email = Column(String(100), unique=True, nullable=False)
     phone_number = Column(String(100), nullable=True)
     password = Column(String(100), nullable=False)
     join_date = Column(DateTime, default=datetime.datetime.utcnow)
+    birth = Column(String(50), nullable=False)
     gender = Column(Enum(Gender), nullable=True)
     investment_level = Column(Integer, nullable=True)
 
@@ -58,16 +60,16 @@ class InvestmentPreference(Base):
     user_id = Column(Integer, ForeignKey('users.user_id'), nullable=False)
 
     # 질문1
-    investment_goal = Column(Enum(InvestmentGoal), nullable=False)
+    investment_goal = Column(String(200), nullable=False)
     # 질문2
-    risk_tolerance = Column(Enum(RiskTolerance), nullable=False)
+    risk_tolerance = Column(String(200), nullable=False)
     # 질문3
-    investment_ratio = Column(Enum(InvestmentRatio), nullable=False)
+    investment_ratio = Column(String(200), nullable=False)
     # 질문 4
-    investment_period = Column(Enum(InvestmentPeriod), nullable=False)
+    investment_period = Column(String(200), nullable=False)
     # 질문 5
-    income_status = Column(Enum(IncomeStatus), nullable=False)
+    income_status = Column(String(200), nullable=False)
     # 질문 6
-    derivatives_experience = Column(Enum(DerivativesExperience), nullable=False)
+    derivatives_experience = Column(String(200), nullable=False)
 
     user = relationship("User", back_populates="investments")

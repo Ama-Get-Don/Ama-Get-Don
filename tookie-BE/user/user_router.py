@@ -26,19 +26,20 @@ router = APIRouter(
 
 
 @router.post("/create", status_code=status.HTTP_204_NO_CONTENT)
-def user_create(_user_create: user_schema.UserCreate, db: Session = Depends(get_db)):
-    user = user_crud.get_existing_user(db, user_create=_user_create)
+def user_create(user_create: user_schema.UserCreate, investmentPreference_create: user_schema.InvestmentPreferenceCreate, db: Session = Depends(get_db)):
+    user = user_crud.get_existing_user(db, user_create=user_create)
     if user:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT,
                             detail="이미 존재하는 사용자입니다.")
-    user_crud.create_user(db=db, user_create=_user_create)
+    user_crud.create_user(db=db, user_create=user_create, investmentPreference_create= investmentPreference_create)
+
 
 @router.post("/login", response_model=user_schema.Token)
 def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(),
                            db: Session = Depends(get_db)):
 
     # check user and password
-    user = user_crud.get_user(db, form_data.username)
+    user = user_crud.get_id(db, form_data.username)
     if not user or not pwd_context.verify(form_data.password, user.password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -48,7 +49,7 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(),
 
     # make access token
     data = {
-        "sub": user.name,
+        "sub": user.tookie_id,
         "exp": datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     }
     access_token = jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
@@ -56,5 +57,5 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(),
     return {
         "access_token": access_token,
         "token_type": "bearer",
-        "username": user.name
+        "tookie_id": user.tookie_id
     }

@@ -1,191 +1,315 @@
-import { useState } from 'react';
-import { Button, Checkbox, Form, Radio } from 'antd';
-import { CheckboxChangeEvent } from 'antd/es/checkbox';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Button as AntButton, Typography, Form } from 'antd';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
+import checkedImage from '../../assets/after_check.png';
+import uncheckedImage from '../../assets/before_check.png';
+import { useNavigate } from "react-router-dom";
 
-type FormState = {
-  investmentGoal: string;
-  lossTolerance: string;
-  riskPercentage: string;
-  investmentPeriod: string;
-  profitExpectation: string;
-  investmentKnowledge: string;
-  financialExperience: string[];
-};
+const { Title } = Typography;
 
-export const InvestmentProfileSurvey = () => {
-  const [form, setForm] = useState<FormState>({
+export const InvestmentProfileSurvey: React.FC = () => {
+  const [answers, setAnswers] = useState({
     investmentGoal: '',
-    lossTolerance: '',
-    riskPercentage: '',
+    riskTolerance: '',
+    investmentRatio: '',
     investmentPeriod: '',
-    profitExpectation: '',
-    investmentKnowledge: '',
-    financialExperience: [],
+    incomeSource: '',
+    derivativeExperience: '',
   });
+  const [isButtonEnabled, setIsButtonEnabled] = useState(false);
 
   const navigate = useNavigate();
 
-  const handleChange = (name: keyof FormState, value: string) => {
-    setForm({
-      ...form,
-      [name]: value,
-    });
-  };
-
-  const handleCheckboxChange = (e: CheckboxChangeEvent) => {
-    const { name, checked, value } = e.target;
-    const fieldName = name as keyof FormState;
-    setForm(prevForm => ({
-      ...prevForm,
-      [fieldName]: checked
-        ? [...(prevForm[fieldName] as string[]), value]
-        : (prevForm[fieldName] as string[]).filter(item => item !== value),
+  const handleCheckboxChange = (key: keyof typeof answers, value: string) => {
+    setAnswers(prev => ({
+      ...prev,
+      [key]: value === prev[key] ? '' : value,
     }));
   };
 
-  const handleNext = () => {
-    navigate('/sign-up/complete');
+  const isAnswersValid = useCallback(() => {
+    return Object.values(answers).every(answer => answer !== '');
+  }, [answers]);
+
+  const handleNext = async () => {
+    if (isAnswersValid()) {
+      try {
+        const response = await fetch('/api/user/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            investment_goal: answers.investmentGoal,
+            risk_tolerance: answers.riskTolerance,
+            investment_ratio: answers.investmentRatio,
+            investment_period: answers.investmentPeriod,
+            income_status: answers.incomeSource,
+            derivatives_experience: answers.derivativeExperience,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        // 성공적으로 저장되면 다음 페이지로 이동
+        navigate('/sign-up/complete');
+      } catch (error) {
+        console.error('Error saving investment profile:', error);
+        // 에러 처리 로직 추가 가능
+      }
+    } else {
+      console.error('Invalid answers');
+    }
   };
 
+
+  useEffect(() => {
+    setIsButtonEnabled(isAnswersValid());
+  }, [answers, isAnswersValid]);
+
   return (
-    <Container>
-      <h1>사용자님의 투자 성향을 알아보기 위한 질문입니다! 아래 질문에 대답해주세요.</h1>
-      <StyledForm>
-        <FormItem label="1. 주식 투자의 목표는 무엇인가요?">
-          <Radio.Group
-            value={form.investmentGoal}
-            onChange={(e) => handleChange('investmentGoal', e.target.value)}
-          >
-            <StyledRadio value="stable">원금 보존과 함께 연 1-2%의 수익률을 얻기 위함</StyledRadio>
-            <StyledRadio value="moderate">연간 수익률 3-5%를 기대하며 원금의 큰 손실은 피하고 싶음</StyledRadio>
-            <StyledRadio value="aggressive">원금 손실을 감수하고 높은 수익률을 기대함</StyledRadio>
-          </Radio.Group>
-        </FormItem>
+    <Form
+      layout="vertical"
+      style={{ maxWidth: '750px', margin: '0 auto', padding: '20px' }}
+    >
+      <Title level={4} style={{ color: '#00D282' }}>
+        투자자님의 투자 성향을 알아보기 위한 질문입니다! 아래 질문에 대답해 주세요.
+      </Title>
 
-        <FormItem label="2. 주식에서 일일 손실을 감수할 수 있는 정도는 어느 정도인가요?">
-          <Radio.Group
-            value={form.lossTolerance}
-            onChange={(e) => handleChange('lossTolerance', e.target.value)}
-          >
-            <StyledRadio value="low">주식에 큰 관심은 없으며 손실을 피하고 싶음</StyledRadio>
-            <StyledRadio value="medium">약간의 손실은 감수할 수 있음</StyledRadio>
-            <StyledRadio value="high">손실을 감수하고 큰 수익을 기대함</StyledRadio>
-          </Radio.Group>
-        </FormItem>
+      <Spacer/>
 
-        <FormItem label="3. 주식에서 수익을 내야 하는 자금의 전체 중 손실 가능한 정도의 비율은 차지하나요?">
-          <Radio.Group
-            value={form.riskPercentage}
-            onChange={(e) => handleChange('riskPercentage', e.target.value)}
-          >
-            <StyledRadio value="10%">10% 이하</StyledRadio>
-            <StyledRadio value="30%">10% 이상 - 30% 미만</StyledRadio>
-            <StyledRadio value="over_30%">30% 이상</StyledRadio>
-          </Radio.Group>
-        </FormItem>
+      <Form.Item
+      label={<span style={{ fontWeight: 'bold' }}>
+        1. 주식 투자의 목표는 무엇인가요?
+      </span>}>
+      <QuestionBox>
+        <CheckboxWrapper onClick={() => handleCheckboxChange('investmentGoal', 'lowRisk')}>
+          <CheckboxImage src={answers.investmentGoal === 'lowRisk' ? checkedImage : uncheckedImage} alt="checkbox" />
+          <span>원금 보존 가능성을 포기하지 아닐길에 예적금 수익률 보다 1~2% 정도만 더 나오면 됨</span>
+      </CheckboxWrapper>
+      </QuestionBox>
+      <QuestionBox>
+        <CheckboxWrapper onClick={() => handleCheckboxChange('investmentGoal', 'moderateRisk')}>
+          <CheckboxImage src={answers.investmentGoal === 'moderateRisk' ? checkedImage : uncheckedImage} alt="checkbox" />
+          <span>예적금 수익률보다 3~5% 정도 기대할 수 있다면, 원금 보존 가능성은 조금 포기할 수 있음</span>
+        </CheckboxWrapper>
+      </QuestionBox>
+      <QuestionBox>
+        <CheckboxWrapper onClick={() => handleCheckboxChange('investmentGoal', 'highRisk')}>
+          <CheckboxImage src={answers.investmentGoal === 'highRisk' ? checkedImage : uncheckedImage} alt="checkbox" />
+          <span>고수익을 기대하고 있으며, 원금 손실 가능성을 감수할 수 있음</span>
+        </CheckboxWrapper>
+      </QuestionBox>
+      </Form.Item>
 
-        <FormItem label="4. 어느 정도의 기간 동안 자금을 투자할 계획인가요?">
-          <Radio.Group
-            value={form.investmentPeriod}
-            onChange={(e) => handleChange('investmentPeriod', e.target.value)}
-          >
-            <StyledRadio value="1_year">1년 미만</StyledRadio>
-            <StyledRadio value="1_5_years">1년 이상 ~ 5년 미만</StyledRadio>
-            <StyledRadio value="over_5_years">5년 이상</StyledRadio>
-          </Radio.Group>
-        </FormItem>
+      <Form.Item
+      label={<span style={{ fontWeight: 'bold' }}>
+        2. 투자에서 원금 손실을 감수할 수 있는 정도는 어느 정도인가요?
+      </span>}>
+      <QuestionBox>
+        <CheckboxWrapper onClick={() => handleCheckboxChange('riskTolerance', 'lowTolerance')}>
+          <CheckboxImage src={answers.riskTolerance === 'lowTolerance' ? checkedImage : uncheckedImage} alt="checkbox" />
+          <span>투자 원금은 반드시 보전</span>
+        </CheckboxWrapper>
+      </QuestionBox>
+      <div>
+      </div>
+      <QuestionBox>
+        <CheckboxWrapper onClick={() => handleCheckboxChange('riskTolerance', 'moderateTolerance')}>
+          <CheckboxImage src={answers.riskTolerance === 'moderateTolerance' ? checkedImage : uncheckedImage} alt="checkbox" />
+          <span>약간의 손실 감수 가능</span>
+        </CheckboxWrapper>
+      </QuestionBox>
+      <div>
+      </div>
+      <QuestionBox>
+        <CheckboxWrapper onClick={() => handleCheckboxChange('riskTolerance', 'highTolerance')}>
+          <CheckboxImage src={answers.riskTolerance === 'highTolerance' ? checkedImage : uncheckedImage} alt="checkbox" />
+          <span>높은 기대 수익을 위해 높은 위험 감수 가능</span>
+        </CheckboxWrapper>
+      </QuestionBox>
+      </Form.Item>
 
-        <FormItem label="5. 사용자님의 수익률을 가장 잘 나타내는 것은 어느 것인가요?">
-          <Radio.Group
-            value={form.profitExpectation}
-            onChange={(e) => handleChange('profitExpectation', e.target.value)}
-          >
-            <StyledRadio value="low">정기적 수입이 있으며, 주식의 손실을 투자 자금에서 충당할 수 있음</StyledRadio>
-            <StyledRadio value="medium">정기적 수입이 있으나, 주식의 어느 정도 손실은 감수할 수 있음</StyledRadio>
-            <StyledRadio value="high">정기적 수입이 없으며, 주식의 손실은 자금의 큰 부분에 영향을 미침</StyledRadio>
-          </Radio.Group>
-        </FormItem>
+      <Form.Item
+      label={<span style={{ fontWeight: 'bold' }}>
+        3. 주식에 투자하고자 하는 자금은 전체 금융 자산 중 어느 정도의 비중을 차지하나요?
+      </span>}>
+      <QuestionBox>
+        <CheckboxWrapper onClick={() => handleCheckboxChange('investmentRatio', 'lessThan10')}>
+          <CheckboxImage src={answers.investmentRatio === 'lessThan10' ? checkedImage : uncheckedImage} alt="checkbox" />
+          <span>10% 미만</span>
+        </CheckboxWrapper>
+      </QuestionBox>
+      <div>
+      </div>
+      <QuestionBox>
+        <CheckboxWrapper onClick={() => handleCheckboxChange('investmentRatio', '10To30')}>
+          <CheckboxImage src={answers.investmentRatio === '10To30' ? checkedImage : uncheckedImage} alt="checkbox" />
+          <span>10% 이상 ~ 30% 미만</span>
+        </CheckboxWrapper>
+      </QuestionBox>
+      <div>
+      </div>
+      <QuestionBox>
+        <CheckboxWrapper onClick={() => handleCheckboxChange('investmentRatio', 'moreThan30')}>
+          <CheckboxImage src={answers.investmentRatio === 'moreThan30' ? checkedImage : uncheckedImage} alt="checkbox" />
+          <span>30% 이상</span>
+      </CheckboxWrapper>
+      </QuestionBox>
+      </Form.Item>
 
-        <FormItem label="6. 채권, 부동산, 펀드 경험 중 긴 여정 상품 편드에 투자한 경험은 얼마나 되시나요?">
-          <Radio.Group
-            value={form.investmentKnowledge}
-            onChange={(e) => handleChange('investmentKnowledge', e.target.value)}
-          >
-            <StyledRadio value="1_year">1년 미만</StyledRadio>
-            <StyledRadio value="1_5_years">1년 이상 ~ 5년 미만</StyledRadio>
-            <StyledRadio value="over_5_years">5년 이상</StyledRadio>
-          </Radio.Group>
-        </FormItem>
+      <Form.Item
+      label={<span style={{ fontWeight: 'bold' }}>
+        4. 어느 정도의 기간 동안 자금을 투자할 계획이신가요?
+      </span>}>
+      <QuestionBox>
+        <CheckboxWrapper onClick={() => handleCheckboxChange('investmentPeriod', 'lessThan1Year')}>
+          <CheckboxImage src={answers.investmentPeriod === 'lessThan1Year' ? checkedImage : uncheckedImage} alt="checkbox" />
+          <span>1년 미만</span>
+        </CheckboxWrapper>
+      </QuestionBox>
+      <div>
+      </div>
+      <QuestionBox>
+        <CheckboxWrapper onClick={() => handleCheckboxChange('investmentPeriod', '1To5Years')}>
+          <CheckboxImage src={answers.investmentPeriod === '1To5Years' ? checkedImage : uncheckedImage} alt="checkbox" />
+          <span>1년 이상 ~ 5년 미만</span>
+        </CheckboxWrapper>
+      </QuestionBox>
+      <div>
+      </div>
+      <QuestionBox>
+        <CheckboxWrapper onClick={() => handleCheckboxChange('investmentPeriod', 'moreThan5Years')}>
+          <CheckboxImage src={answers.investmentPeriod === 'moreThan5Years' ? checkedImage : uncheckedImage} alt="checkbox" />
+          <span>5년 이상</span>
+        </CheckboxWrapper>
+      </QuestionBox>
+      </Form.Item>
 
-        <FormItem label={
-          <>
-            7. 고령투자자, 주부, 은퇴자 등 금융 투자 상품에 대한 이해가 부족하거나 투자 경험이 없는 투자자의 경우 <br />
-            「금융소비자 보호모범규준」에 따른 금융 취약 계층으로 금융 소비자의 불이익 사항을 다른 정보보다 <br />
-            우선하여 설명 받으실 수 있습니다. 해당 항목에 체크하여 주시기 바랍니다. <br />
-            단, 금융 취약자에 대한 정보 제공을 거부하는 경우 「금융소비자 보호모범규준」상 강화된 적합성 원칙 및 <br />
-            설명 의무의 적용이 배제됩니다.
-          </>
-        }>
-          <CheckboxGroup>
-            <Checkbox name="financialExperience" value="financial_advisor" onChange={handleCheckboxChange}>금융 투자 상품에 대한 이해가 부족하거나 투자 경험이 없음</Checkbox>
-            <Checkbox name="financialExperience" value="none" onChange={handleCheckboxChange}>해당 사항 없음</Checkbox>
-          </CheckboxGroup>
-        </FormItem>
+      <Form.Item
+      label={<span style={{ fontWeight: 'bold' }}>
+        5. 사용자님의 수입원을 가장 잘 나타내는 것은 어느 것인가요?
+      </span>}>
+      <QuestionBox>
+        <CheckboxWrapper onClick={() => handleCheckboxChange('incomeSource', 'unstableIncome')}>
+          <CheckboxImage src={answers.incomeSource === 'unstableIncome' ? checkedImage : uncheckedImage} alt="checkbox" />
+          <span>정기적 수입이 있으며, 향후 현재 수준의 유지 또는 증가가 예상됨</span>
+        </CheckboxWrapper>
+      </QuestionBox>
+      <div>
+      </div>
+      <QuestionBox>
+        <CheckboxWrapper onClick={() => handleCheckboxChange('incomeSource', 'stableIncome')}>
+          <CheckboxImage src={answers.incomeSource === 'stableIncome' ? checkedImage : uncheckedImage} alt="checkbox" />
+          <span>정기적 수입이 있으나, 향후 감소 또는 불안정이 예상됨</span>
+        </CheckboxWrapper>
+      </QuestionBox>
+      <div>
+      </div>
+      <QuestionBox>
+        <CheckboxWrapper onClick={() => handleCheckboxChange('incomeSource', 'noIncome')}>
+          <CheckboxImage src={answers.incomeSource === 'noIncome' ? checkedImage : uncheckedImage} alt="checkbox" />
+          <span>현재 정기적 수입이 없음</span>
+        </CheckboxWrapper>
+      </QuestionBox>
+      </Form.Item>
 
-        <ButtonContainer>
-          <Button type="primary" htmlType="submit" onClick={handleNext}>
-            다음
-          </Button>
-        </ButtonContainer>
-      </StyledForm>
-    </Container>
+      <Form.Item
+      label={<span style={{ fontWeight: 'bold' }}>
+        6. 파생 상품, 파생 결합 증권 및 파생 상품 펀드에 투자한 경험은 얼마나 되시나요?
+      </span>}>
+      <QuestionBox>
+        <CheckboxWrapper onClick={() => handleCheckboxChange('derivativeExperience', 'lessThan1Year')}>
+          <CheckboxImage src={answers.derivativeExperience === 'lessThan1Year' ? checkedImage : uncheckedImage} alt="checkbox" />
+          <span>1년 미만</span>
+        </CheckboxWrapper>
+      </QuestionBox>
+      <div>
+      </div>
+      <QuestionBox>
+        <CheckboxWrapper onClick={() => handleCheckboxChange('derivativeExperience', '1To3Years')}>
+          <CheckboxImage src={answers.derivativeExperience === '1To3Years' ? checkedImage : uncheckedImage} alt="checkbox" />
+          <span>1년 이상 ~ 3년 미만</span>
+        </CheckboxWrapper>
+      </QuestionBox>
+      <div>
+      </div>
+      <QuestionBox>
+        <CheckboxWrapper onClick={() => handleCheckboxChange('derivativeExperience', 'moreThan3Years')}>
+          <CheckboxImage src={answers.derivativeExperience === 'moreThan3Years' ? checkedImage : uncheckedImage} alt="checkbox" />
+          <span>3년 이상</span>
+        </CheckboxWrapper>
+      </QuestionBox>
+      </Form.Item>
+
+      <StyledButton
+      type="primary"
+      disabled={!isButtonEnabled}
+      shape="round"
+      onClick={handleNext}>
+        회원가입
+      </StyledButton>
+</Form>
   );
 };
 
-const Container = styled.div`
+
+      const CheckboxWrapper = styled.div`
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  height: 100vh;
-  padding: 20px;
+  margin-bottom: 8px;
+  cursor: pointer;
 `;
 
-const StyledForm = styled(Form)`
-  width: 100%;
-  max-width: 800px; /* Increase the width */
+const CheckboxImage = styled.img`
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
 `;
 
-const FormItem = styled(Form.Item)`
-  width: 100%;
-  white-space: pre-wrap; /* This will make long text wrap and prevent overflow */
+const Spacer = styled.div`
+    height: 30px;
 `;
 
-const ButtonContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-`;
+const StyledButton = styled(AntButton)`
+  &&& {
+    width: 100%;
+    height: 40px;
+    background-color: #00D282;
+    border-color: #00D282;
+    color: white;
+    border: none;
 
-const StyledRadio = styled(Radio)`
-  display: block;
-  background: #f5f5f5;
-  padding: 10px;
-  margin-bottom: 10px;
-  border-radius: 5px;
-  border: 1px solid #d9d9d9;
-  width: 100%;
-  &:hover {
-    border-color: #40a9ff;
+    &:hover, &:focus {
+      background-color: #00B870;
+      border-color: #00B870;
+      color: white;
+    }
+
+    &:active {
+      background-color: #009A5E;
+      border-color: #009A5E;
+    }
+
+    &:disabled {
+      background-color: #929292;
+      color: white;
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
   }
 `;
 
-const CheckboxGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+const QuestionBox = styled.div`
+  display: inline-block;
+  height: 40px;
+  background-color: #f0f0f0;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+  width: auto;
 `;
 
 export default InvestmentProfileSurvey;
