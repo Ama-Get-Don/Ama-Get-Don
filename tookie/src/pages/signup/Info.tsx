@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { useState } from "react";
 
 
+
 interface FormValues {
     username: string;
     password: string;
@@ -15,11 +16,13 @@ interface FormValues {
 }
 
 
+
 export const Info: React.FC = () => {
     const [form] = Form.useForm();
     const navigate = useNavigate();
     const [selectedGender, setSelectedGender] = useState<'male' | 'female' | null>(null);
     const [isButtonEnabled, setIsButtonEnabled] = useState(false);
+
 
     const handleFinish = (values: FormValues) => {
         console.log('Form Values: ', values);

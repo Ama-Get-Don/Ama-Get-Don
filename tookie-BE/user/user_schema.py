@@ -1,29 +1,52 @@
-from pydantic import BaseModel, EmailStr, validator
-from enum import Enum
-
-class GenderEnum(str, Enum):
-    남자 = "Male"
-    여자 = "Female"
+# user_schema.py
+from pydantic import BaseModel, EmailStr, field_validator
+from pydantic_core.core_schema import FieldValidationInfo
+import datetime
 
 class UserCreate(BaseModel):
+    tookie_id : str
     name: str
-    password: str
+    password1: str
+    password2: str
     email: EmailStr
-    birthdate: str  
     phone_number: str
-    gender: GenderEnum
+    birth:str
+    gender: str
+    investment_level: int
 
-    @validator('name', 'password', 'email', 'birthdate', 'phone_number')
+    @field_validator('tookie_id', 'name', 'password1', 'password2', 'email', 'phone_number', 'birth', 'gender')
     def not_empty(cls, v):
         if not v or not v.strip():
             raise ValueError('빈 값은 허용되지 않습니다.')
         return v
 
-    class Config:
-        use_enum_values = True
+    @field_validator('password2')
+    def passwords_match(cls, v, info: FieldValidationInfo):
+        if 'password1' in info.data and v != info.data['password1']:
+            raise ValueError('비밀번호가 일치하지 않습니다')
+        return v
 
+    class Config:
+        from_attributes = True
+
+class InvestmentPreferenceCreate(BaseModel):
+
+    user_id : int
+    investment_goal: str
+    risk_tolerance: str
+    investment_ratio: str
+    investment_period: str
+    income_status: str
+    derivatives_experience: str
+    @field_validator('investment_goal', 'risk_tolerance', 'investment_ratio', 'investment_period', 'income_status', 'derivatives_experience')
+    def not_empty(cls, v):
+        if not v or not v.strip():
+            raise ValueError('빈 값은 허용되지 않습니다.')
+        return v
+    class Config:
+        from_attributes = True
 
 class Token(BaseModel):
     access_token: str
     token_type: str
-    username: str
+    tookie_id: str

@@ -13,6 +13,7 @@ export const Terms = () => {
     const [isTerm1Checked, setIsTerm1Checked] = useState(false);
     const [isTerm2Checked, setIsTerm2Checked] = useState(false);
     const [isTerm3Checked, setIsTerm3Checked] = useState(false);
+    const [isTerm4Checked, setIsTerm4Checked] = useState(false);
     const [isButtonEnabled, setIsButtonEnabled] = useState(false);
     
     const navigate = useNavigate();
@@ -23,12 +24,14 @@ export const Terms = () => {
         setIsTerm1Checked(newCheckedStatus);
         setIsTerm2Checked(newCheckedStatus);
         setIsTerm3Checked(newCheckedStatus);
+        setIsTerm4Checked(newCheckedStatus);
     };
     
     const handleTermChange = (term: string) => {
         let newTerm1Checked = isTerm1Checked;
         let newTerm2Checked = isTerm2Checked;
         let newTerm3Checked = isTerm3Checked;
+        let newTerm4Checked = isTerm4Checked;
     
         if (term === 'term1') {
             newTerm1Checked = !isTerm1Checked;
@@ -39,20 +42,23 @@ export const Terms = () => {
         } else if (term === 'term3') {
             newTerm3Checked = !isTerm3Checked;
             setIsTerm3Checked(newTerm3Checked);
+        } else if (term === 'term4') {
+            newTerm4Checked = !isTerm4Checked;
+            setIsTerm4Checked(newTerm4Checked);
         }
     
-        const allChecked = newTerm1Checked && newTerm2Checked && newTerm3Checked;
+        const allChecked = newTerm1Checked && newTerm2Checked && newTerm3Checked && newTerm4Checked;
         setIsAllChecked(allChecked);
     };
     
     useEffect(() => {
-        setIsButtonEnabled(isTerm1Checked && isTerm2Checked);
+        setIsButtonEnabled(isTerm1Checked && isTerm2Checked && isTerm3Checked);
     
-        setIsAllChecked(isTerm1Checked && isTerm2Checked && isTerm3Checked);
-    }, [isTerm1Checked, isTerm2Checked, isTerm3Checked]);
+        setIsAllChecked(isTerm1Checked && isTerm2Checked && isTerm3Checked && isTerm4Checked);
+    }, [isTerm1Checked, isTerm2Checked, isTerm3Checked, isTerm4Checked]);
     
     const handleNext = () => {
-        if (isTerm1Checked && isTerm2Checked) {
+        if (isTerm1Checked && isTerm2Checked && isTerm3Checked) {
             navigate('/sign-up/info');
         }
     }
@@ -87,14 +93,15 @@ export const Terms = () => {
                         </span>
                     </div>
                     <TextArea
-                        value="서비스 이용약관이 들어갑니다. 내용은 추후 수정될 예정입니다."
+                        value="서비스 제공 목적:
+본 서비스는 사용자의 주식 관련 지식 수준과 투자 성향을 고려하여 맞춤형 투자 조언을 제공하는 AI 챗봇 서비스입니다."
                         autoSize={{ minRows: 3, maxRows: 5 }}
                         readOnly
                     />
                 </TermItem>
 
                 <TermItem>
-                    <div
+                    <div 
                         onClick={() => handleTermChange('term2')} 
                         style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
                     >
@@ -104,7 +111,8 @@ export const Terms = () => {
                         </span>
                     </div>
                     <TextArea
-                        value="개인정보보호법에 따라 안내 드리오니 자세히 읽은 후 동의하여 주시기 바랍니다."
+                        value="서비스 제공 목적:
+본 서비스는 사용자의 주식 관련 지식 수준과 투자 성향을 고려하여 맞춤형 투자 조언을 제공하는 AI 챗봇 서비스입니다."
                         autoSize={{ minRows: 3, maxRows: 5 }}
                         readOnly
                     />
@@ -116,6 +124,23 @@ export const Terms = () => {
                         style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
                     >
                         <img src={isTerm3Checked ? checkedImage : uncheckedImage} alt="checkbox" style={{ width: '20px', marginRight: '8px' }} />
+                        <span>
+                            <span style={{ color: '#00A868' }}>[필수]</span> 개인정보 수집 및 이용
+                        </span>
+                    </div>
+                    <TextArea
+                        value="개인정보보호법에 따라 회원가입 신청하시는 분께 수집하는 개인정보의 항목, 개인정보의 수집 및 이용목적, 개인정보의 보유 및 이용기간, 개인정보 제공 및 공유에 관한 사항을 안내 드리오니 자세히 읽은 후 동의하여 주시기 바랍니다."
+                        autoSize={{ minRows: 3, maxRows: 5 }}
+                        readOnly
+                    />
+                </TermItem>
+
+                <TermItem>
+                    <div
+                        onClick={() => handleTermChange('term4')} 
+                        style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+                    >
+                        <img src={isTerm4Checked ? checkedImage : uncheckedImage} alt="checkbox" style={{ width: '20px', marginRight: '8px' }} />
                         <span>
                         <span style={{ color: '#929292' }}>[선택]</span> 개인정보 수집 및 이용
                         </span>
@@ -173,7 +198,7 @@ const StyledButton = styled(AntButton)`
     }
 
     &:disabled {
-      background-color: #ccc;
+      background-color: #929292;
       color: white;
       opacity: 0.7;
       cursor: not-allowed;
