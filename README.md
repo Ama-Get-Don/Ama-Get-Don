@@ -8,7 +8,7 @@
 
 이 프로젝트의 사용자 흐름은 사용자가 애플리케이션을 시작하여 챗봇과 상호 작용하는 데 있어 매끄러운 경험을 제공하도록 설계되었습니다. 주요 단계는 다음과 같습니다:
 
-![alt text](readme_images/user_flow.png)
+![User Flow](readme_images/user_flow.png)
 
 1. **시작**: 사용자는 애플리케이션을 시작하며 로그인 또는 회원가입 중 하나를 선택할 수 있습니다.
 2. **회원가입 과정**: 사용자가 회원가입을 선택하면 다음의 단계를 거칩니다:
@@ -66,25 +66,20 @@
 
 ### UI 캐릭터
 - **씨앗 -> 새순 -> 투키**
-- (씨앗)
-   ![Seed](readme_images/seed.png)
-- (새순)
-   ![Sprout](readme_images/sprout.png)
-- (투키)
-   ![Seed](readme_images/tookie.png)
-   
+![Character](readme_images/character.png)
+
 ### UI 화면 
 
 다음은 주요 인터페이스의 화면입니다:
 
-1. **메인 페이지**: ![Main Page Screenshot](readme_images/main.png)
-2. **로그인 페이지**: ![Login Page Screenshot](readme_images/login.png)
-3. **회원가입 페이지**: ![Sign-Up Page Screenshot](readme_images/image_1.png)
-   ![Sign-Up Page Screenshot 2](readme_images/image_2.png)
-   ![Sign-Up Page Screenshot 3](readme_images/image_3.png)
-4. **챗봇 채팅 페이지**: ![Chatbot Chat Page Screenshot](readme_images/chat_1.png)
-   ![Chatbot Chat Page Screenshot 2](readme_images/chat_2.png)
-5. **내 정보 페이지**: ![User Information Page Screenshot](readme_images/mypage.png)
+1. **메인 페이지**: ![Main Page](readme_images/main.png)
+2. **로그인 페이지**: ![Login Page](readme_images/login.png)
+3. **회원가입 페이지**: ![Sign-Up Page](readme_images/image_1.png)
+   ![Sign-Up Page 2](readme_images/image_2.png)
+   ![Sign-Up Page 3](readme_images/image_3.png)
+4. **챗봇 채팅 페이지**: ![Chatbot Chat Page 1](readme_images/chat_1.png)
+   ![Chatbot Chat Page 2](readme_images/chat_2.png)
+5. **내 정보 페이지**: ![User Information Page](readmi_images/user_info.png)
 
 
 
