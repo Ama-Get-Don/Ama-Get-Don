@@ -2,16 +2,16 @@ import { Form, Input, DatePicker, Button as AntButton } from "antd";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { useState } from "react";
-import moment from "moment";  // DatePicker의 값 처리를 위해 moment를 import
+import moment from "moment";  
 
 interface FormValues {
     username: string;
     password: string;
     email: string;
     name: string;
-    birthdate: moment.Moment;  // DatePicker에서 반환되는 값의 타입은 moment 객체입니다.
+    birthdate: moment.Moment;  
     phone: string;
-    gender: 'Male' | 'Female';  // gender 값을 명확히 지정
+    gender: 'Male' | 'Female';  
 }
 
 export const Info: React.FC = () => {
@@ -20,7 +20,7 @@ export const Info: React.FC = () => {
     const [selectedGender, setSelectedGender] = useState<'male' | 'female' | null>(null);
     const [isButtonEnabled, setIsButtonEnabled] = useState(false);
 
-    const handleFinish = async (values: FormValues) => {  // values의 타입을 명확하게 정의
+    const handleFinish = async (values: FormValues) => {  
         const genderMap = {
             Male: "Male",
             Female: "Female"
