@@ -21,7 +21,7 @@
    - 메시지를 입력하여 추가 질문
    - 개인정보를 확인 및 수정
    - 로그아웃 또는 캐릭터 성장 단계를 직접 변경
-   
+
 ### UI 컨셉
 - ‘투’자 능력 ‘키’우기 -> 서비스명: 투키(TOOKIE), 로고 설명(말풍선 안에 주식 그래프)
 - 스투키(식물) 캐릭터를 성장시켜 나가는 컨셉
@@ -48,9 +48,8 @@
    - 깔끔하고 최소한의 디자인으로 사용자가 다음 단계로 쉽게 진행할 수 있도록 유도
 2. **로그인 페이지**: ![Login Page](readme_images/login.png)
    - 기존 사용자를 위한 간단하고 직관적인 로그인 인터페이스
-3. **회원가입 페이지**: ![Sign-Up Page](readme_images/agree.png)
-   ![Sign-Up Page 2](readme_images/survey_1.png)
-   ![Sign-Up Page 3](readme_images/survey_2.png)
+3. **회원가입 페이지**: 
+   ![Sign-Up Page 2](readme_images/survey_1.png) | ![Sign-Up Page 3](readme_images/survey_2.png)
    - **약관 동의**: 사용자는 약관에 동의해야 합니다.
    - **개인정보 입력**: 사용자가 개인 정보를 입력합니다.
    - **설문조사**: 사용자의 지식 수준과 투자 상황에 대한 두 가지 설문조사를 진행합니다.
