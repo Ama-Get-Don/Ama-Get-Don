@@ -2,9 +2,20 @@ import { Button } from 'antd';
 import { styled } from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import SeedlingImage from '/src/assets/seed.png'; 
+import { useGlobalState } from '../../GlobalState.tsx';  
 
 export const SignUpComplete = () => {
   const navigate = useNavigate();
+  const { user_create } = useGlobalState();  
+
+
+  const userName = user_create.name || '사용자'; // 사용자 이름
+  const investmentLevel = user_create.investment_level || 1; // 투자 단계 (기본값 1)
+  
+  // 투자 단계에 따른 명칭 설정
+  const investmentStageName = investmentLevel === 1 ? '씨앗' 
+                        : investmentLevel === 2 ? '새순' 
+                        : '투키';
 
   const handleChat = () => {
     navigate('/chat');
@@ -17,7 +28,7 @@ export const SignUpComplete = () => {
       </SeedlingWrapper>
       <Title>회원가입 완료!</Title>
       <Description>
-        김주식님은 ‘씨앗’ 단계입니다.
+        {userName}님은 ‘{investmentStageName}’ 단계입니다.
         <br />
         투키와 함께 주식 투자 능력을 키워봐요!
         <br />
