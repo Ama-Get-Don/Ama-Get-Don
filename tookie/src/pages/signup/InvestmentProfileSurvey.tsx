@@ -31,13 +31,39 @@ export const InvestmentProfileSurvey: React.FC = () => {
     return Object.values(answers).every(answer => answer !== '');
   }, [answers]);
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (isAnswersValid()) {
-      navigate('/sign-up/complete');
+      try {
+        const response = await fetch('/api/user/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            investment_goal: answers.investmentGoal,
+            risk_tolerance: answers.riskTolerance,
+            investment_ratio: answers.investmentRatio,
+            investment_period: answers.investmentPeriod,
+            income_status: answers.incomeSource,
+            derivatives_experience: answers.derivativeExperience,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        // 성공적으로 저장되면 다음 페이지로 이동
+        navigate('/sign-up/complete');
+      } catch (error) {
+        console.error('Error saving investment profile:', error);
+        // 에러 처리 로직 추가 가능
+      }
     } else {
       console.error('Invalid answers');
     }
   };
+
 
   useEffect(() => {
     setIsButtonEnabled(isAnswersValid());
