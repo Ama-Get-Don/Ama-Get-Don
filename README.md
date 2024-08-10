@@ -49,7 +49,11 @@
 2. **로그인 페이지**: ![Login Page](readme_images/login.png)
    - 기존 사용자를 위한 간단하고 직관적인 로그인 인터페이스
 3. **회원가입 페이지**: 
-   ![Sign-Up Page 2](readme_images/survey_1.png) | ![Sign-Up Page 3](readme_images/survey_2.png)
+   <div style="display: flex; justify-content: space-between;">
+      <img src="readme_images/survey_1.png" alt="Sign-Up Page 2" width="45%">
+      <img src="readme_images/survey_2.png" alt="Sign-Up Page 3" width="45%">
+   </div>
+   
    - **약관 동의**: 사용자는 약관에 동의해야 합니다.
    - **개인정보 입력**: 사용자가 개인 정보를 입력합니다.
    - **설문조사**: 사용자의 지식 수준과 투자 상황에 대한 두 가지 설문조사를 진행합니다.
