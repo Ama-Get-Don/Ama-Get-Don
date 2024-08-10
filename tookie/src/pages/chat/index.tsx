@@ -72,8 +72,8 @@ export const Chat = () => {
                         'Accept': 'application/json; charset=utf-8',
                     },
                     body: JSON.stringify({
-                        user_id: "1",
-                        user_level: 1,
+                        user_id: 1,
+                        investment_level: 1,
                         user_chat: input,
                     }),
                 });
