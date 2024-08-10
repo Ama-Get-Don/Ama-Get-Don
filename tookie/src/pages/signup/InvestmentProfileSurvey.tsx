@@ -279,10 +279,10 @@ const StyledButton = styled(AntButton)`
 const QuestionBox = styled.div`
   display: inline-block;
   height: 40px;
-  background-color: #f0f0f0; /* 회색 배경 */
-  border-radius: 5px; /* 모서리 둥글기 */
-  padding: 10px; /* 안쪽 여백 */
-  margin-bottom: 10px; /* 아래 여백 */
+  background-color: #f0f0f0;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
   width: auto;
 `;
 
