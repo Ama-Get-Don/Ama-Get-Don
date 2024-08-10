@@ -31,7 +31,6 @@ class UserCreate(BaseModel):
 
 class InvestmentPreferenceCreate(BaseModel):
 
-    user_id : int
     investment_goal: str
     risk_tolerance: str
     investment_ratio: str
