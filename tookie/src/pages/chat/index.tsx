@@ -166,7 +166,6 @@ export const Chat = () => {
     const [partialMessage, setPartialMessage] = useState<string>('');
     const [showWelcomeScreen, setShowWelcomeScreen] = useState(true);
     const [recommendedQuestions, setRecommendedQuestions] = useState<Question[]>([]);
-    // const [botMessageId, setBotMessageId] = useState(null || Number);
     const [botMessageId, setBotMessageId] = useState<number | null>(null);
 
     // Avatar 이미지를 결정하는 함수
@@ -211,21 +210,6 @@ export const Chat = () => {
             }
         };
     }, [eventSource]);
-
-    // useEffect(() => {
-    //     if (isMessageEnd) {
-    //         const botMessage: Message = {
-    //             id: messages.length + 1,
-    //             sender: 'bot',
-    //             content: partialMessage,
-    //         };
-
-    //         setMessages((prevMessages) => [...prevMessages, botMessage]);
-    //         setPartialMessage('');
-
-    //     }
-    //     setIsMessageEnd(false)
-    // }, [isMessageEnd]);
 
     useEffect(() => {
         if (botMessageId === null) {
