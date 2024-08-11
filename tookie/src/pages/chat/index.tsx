@@ -4,11 +4,12 @@ import styled from 'styled-components';
 import sendButtonDark from '/src/assets/sendButtonDark.png';
 import sendButtonLight from '/src/assets/sendButtonLight.png';
 import { beginnerQuestions, intermediateQuestions, advancedQuestions, Question } from './questions';
-import { useGlobalState } from '../../GlobalState.tsx'; 
+import { useGlobalState } from '../../GlobalState.tsx';
 import seedChatImage from '/src/assets/seed_chat.png';
 import sproutChatImage from '/src/assets/sprout_chat.png';
 import tookieChatImage from '/src/assets/tookie_chat.png';
 
+import ReactMarkdown from 'react-markdown';
 
 const { Content } = Layout;
 const { TextArea } = Input;
@@ -158,15 +159,14 @@ const MessageBubble = styled.div<{ sender: 'user' | 'bot' }>`
 `;
 
 export const Chat = () => {
-    const { user_create, user_id } = useGlobalState(); 
+    const { user_create, user_id } = useGlobalState();
     const [messages, setMessages] = useState<Message[]>(initialMessages);
     const [input, setInput] = useState('');
     const [eventSource, setEventSource] = useState<EventSource | null>(null);
     const [partialMessage, setPartialMessage] = useState<string>('');
-    const [isChatEnd, setIsChatEnd] = useState(false);
     const [showWelcomeScreen, setShowWelcomeScreen] = useState(true);
     const [recommendedQuestions, setRecommendedQuestions] = useState<Question[]>([]);
-    
+
     // Avatar 이미지를 결정하는 함수
     const getAvatarImage = () => {
         if (user_create.investment_level === 1) {
@@ -179,24 +179,26 @@ export const Chat = () => {
             return null;
         }
     };
+    const [isMessageEnd, setIsMessageEnd] = useState(false);
 
     useEffect(() => {
         const getRandomQuestions = (questions: Question[], num: number) => {
             return questions.sort(() => 0.5 - Math.random()).slice(0, num);
         };
-    
+
+        // investment_level에 따른 추천 질문 설정
         let selectedQuestions: Question[] = [];
-    
-        if (user_create.investment_level === 1) {
+        const investment_level = Number(localStorage.getItem('investment_level'));
+        if (investment_level === 1) {
             selectedQuestions = getRandomQuestions(beginnerQuestions, 3);
-        } else if (user_create.investment_level === 2) {
+        } else if (investment_level === 2) {
             selectedQuestions = getRandomQuestions(intermediateQuestions, 3);
-        } else if (user_create.investment_level === 3) {
+        } else if (investment_level === 3) {
             selectedQuestions = getRandomQuestions(advancedQuestions, 3);
         } else {
             console.error('investment_level 값이 유효하지 않습니다:', user_create.investment_level);
         }
-    
+
         setRecommendedQuestions(selectedQuestions);
     }, [user_create.investment_level]);
 
@@ -209,18 +211,19 @@ export const Chat = () => {
     }, [eventSource]);
 
     useEffect(() => {
-        if (!isChatEnd) return;
+        if (isMessageEnd) {
+            const botMessage: Message = {
+                id: messages.length + 1,
+                sender: 'bot',
+                content: partialMessage,
+            };
 
-        const botMessage: Message = {
-            id: messages.length + 1,
-            sender: 'bot',
-            content: partialMessage,
-        };
+            setMessages((prevMessages) => [...prevMessages, botMessage]);
+            setPartialMessage('');
 
-        setMessages((prevMessages) => [...prevMessages, botMessage]);
-        setPartialMessage('');
-        setIsChatEnd(false);
-    }, [isChatEnd]);
+        }
+        setIsMessageEnd(false)
+    }, [isMessageEnd]);
 
     const handleSend = async () => {
         if (input.trim()) {
@@ -234,10 +237,10 @@ export const Chat = () => {
             setMessages([...messages, userMessage]);
             setInput('');
 
-            if (!user_id) {
-                console.error('User ID가 없습니다. 로그인을 확인해주세요.');
-                return;
-            }
+            // if (!user_id) {
+            //     console.error('User ID가 없습니다. 로그인을 확인해주세요.');
+            //     return;
+            // }
 
             try {
                 const response = await fetch('http://172.16.1.197:5000/chat', {
@@ -247,8 +250,8 @@ export const Chat = () => {
                         'Accept': 'application/json; charset=utf-8',
                     },
                     body: JSON.stringify({
-                        user_id: user_id,
-                        investment_level: user_create.investment_level,
+                        user_id: localStorage.getItem('user_id'),
+                        investment_level: localStorage.getItem('investment_level'),
                         user_chat: input,
                     }),
                 });
@@ -263,6 +266,7 @@ export const Chat = () => {
             }
         }
     };
+
 
     const handleStartChat = (question: Question) => {
         setShowWelcomeScreen(false);
@@ -287,6 +291,7 @@ export const Chat = () => {
             eventSource.close();
         }
 
+        const user_id = localStorage.getItem('user_id')
         if (!user_id) {
             console.error('User ID가 없습니다. 로그인을 확인해주세요.');
             return;
@@ -297,9 +302,10 @@ export const Chat = () => {
 
         source.onmessage = (event) => {
             const data = event.data.trim();
-            setPartialMessage((prev) => prev + " " + data);
-            if (data === '') {
-                setIsChatEnd(true);
+            if (data === "END") {
+                setIsMessageEnd(true)
+            } else {
+                setPartialMessage((prev) => prev + " " + data);
             }
         };
 
@@ -337,7 +343,7 @@ export const Chat = () => {
                                     <MessageContent sender={item.sender}>
                                         <Avatar>{item.sender === 'bot' ? 'B' : 'U'}</Avatar>
                                         <MessageBubble sender={item.sender}>
-                                            {item.content}
+                                            <ReactMarkdown>{item.content}</ReactMarkdown>
                                         </MessageBubble>
                                     </MessageContent>
                                 </MessageItem>
