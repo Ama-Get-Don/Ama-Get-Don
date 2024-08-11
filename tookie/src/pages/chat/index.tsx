@@ -9,6 +9,7 @@ import seedChatImage from '/src/assets/seed_chat.png';
 import sproutChatImage from '/src/assets/sprout_chat.png';
 import tookieChatImage from '/src/assets/tookie_chat.png';
 
+import ReactMarkdown from 'react-markdown';
 
 const { Content } = Layout;
 const { TextArea } = Input;
@@ -342,7 +343,7 @@ export const Chat = () => {
                                     <MessageContent sender={item.sender}>
                                         <Avatar>{item.sender === 'bot' ? 'B' : 'U'}</Avatar>
                                         <MessageBubble sender={item.sender}>
-                                            {item.content}
+                                            <ReactMarkdown>{item.content}</ReactMarkdown>
                                         </MessageBubble>
                                     </MessageContent>
                                 </MessageItem>
