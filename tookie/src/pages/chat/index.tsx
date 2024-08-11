@@ -166,6 +166,8 @@ export const Chat = () => {
     const [partialMessage, setPartialMessage] = useState<string>('');
     const [showWelcomeScreen, setShowWelcomeScreen] = useState(true);
     const [recommendedQuestions, setRecommendedQuestions] = useState<Question[]>([]);
+    // const [botMessageId, setBotMessageId] = useState(null || Number);
+    const [botMessageId, setBotMessageId] = useState<number | null>(null);
 
     // Avatar 이미지를 결정하는 함수
     const getAvatarImage = () => {
@@ -210,20 +212,41 @@ export const Chat = () => {
         };
     }, [eventSource]);
 
+    // useEffect(() => {
+    //     if (isMessageEnd) {
+    //         const botMessage: Message = {
+    //             id: messages.length + 1,
+    //             sender: 'bot',
+    //             content: partialMessage,
+    //         };
+
+    //         setMessages((prevMessages) => [...prevMessages, botMessage]);
+    //         setPartialMessage('');
+
+    //     }
+    //     setIsMessageEnd(false)
+    // }, [isMessageEnd]);
+
     useEffect(() => {
-        if (isMessageEnd) {
+        if (botMessageId === null) {
+            // 새 봇 메시지를 추가하고 id를 저장합니다.
             const botMessage: Message = {
                 id: messages.length + 1,
                 sender: 'bot',
                 content: partialMessage,
             };
-
+            setBotMessageId(botMessage.id);
             setMessages((prevMessages) => [...prevMessages, botMessage]);
-            setPartialMessage('');
-
+        } else {
+            // 기존 메시지를 업데이트합니다.
+            setMessages((prevMessages) =>
+                prevMessages.map((msg) =>
+                    msg.id === botMessageId ? { ...msg, content: partialMessage } : msg
+                )
+            );
         }
-        setIsMessageEnd(false)
-    }, [isMessageEnd, messages.length, partialMessage]);
+    }, [partialMessage]);
+
 
     const handleSend = async () => {
         if (input.trim()) {
