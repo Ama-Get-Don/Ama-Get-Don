@@ -17,8 +17,9 @@ export const SignUpComplete = () => {
                         : investmentLevel === 2 ? '새순' 
                         : '투키';
 
-  const handleChat = () => {
-    navigate('/chat');
+
+  const handleLogin = () => {
+    navigate('/sign-in');
   };
 
   return (
@@ -34,7 +35,7 @@ export const SignUpComplete = () => {
         <br />
         <SmallText>(내 정보 설정 창에서 성장 단계를 직접 변경할 수 있어요)</SmallText>
       </Description>
-      <StyledButton onClick={handleChat}>
+      <StyledButton onClick={handleLogin}>
         대화 시작하기
       </StyledButton>
     </Container>
