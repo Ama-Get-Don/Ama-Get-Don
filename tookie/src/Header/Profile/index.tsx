@@ -48,6 +48,10 @@ const Profile: React.FC = () => {
     if (e.key === 'myInfo') {
       setModalVisible(true);
     } else if (e.key === 'logout') {
+      // 사용자 정보 초기화
+      localStorage.removeItem('userToken'); // 예: 토큰 삭제
+      localStorage.removeItem('userInfo');  // 예: 사용자 정보 삭제
+      // 로그아웃 후 홈 화면으로 이동
       navigate('/');
     }
   };
