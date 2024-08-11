@@ -44,19 +44,22 @@ const Profile: React.FC = () => {
     setAvatarImage(selectedGender === 'male' ? maleImage : femaleImage);
   }, [selectedGender]);
 
-  const handleMenuClick = (e: { key: string }) => {
+  const handleMenuClick = async (e: { key: string }) => {
     if (e.key === 'myInfo') {
       setModalVisible(true);
     } else if (e.key === 'logout') {
-      // 사용자 정보 초기화
-      localStorage.removeItem('userToken'); // 예: 토큰 삭제
-      localStorage.removeItem('userInfo');  // 예: 사용자 정보 삭제
+      // LocalStorage에서 모든 정보를 제거
+      localStorage.removeItem('token');
+      localStorage.removeItem('user_id');
+      localStorage.removeItem('investment_level');
       
       // 삭제된 정보 확인
-      console.log('userToken after logout:', localStorage.getItem('userToken'));
-      console.log('userInfo after logout:', localStorage.getItem('userInfo'));
-      
+      console.log('token after logout:', localStorage.getItem('token'));
+      console.log('user_id after logout:', localStorage.getItem('user_id'));
+      console.log('investment_level after logout:', localStorage.getItem('investment_level'));
+  
       // 로그아웃 후 홈 화면으로 이동
+      await new Promise(resolve => setTimeout(resolve, 100)); // 혹시나 하는 딜레이 추가
       navigate('/');
     }
   };
