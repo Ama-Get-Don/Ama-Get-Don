@@ -243,7 +243,7 @@ export const Chat = () => {
             // }
 
             try {
-                const response = await fetch('http://172.16.1.197:5000/chat', {
+                const response = await fetch('http://172.30.1.44:5000/chat', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json; charset=utf-8',
@@ -297,7 +297,7 @@ export const Chat = () => {
             return;
         }
 
-        const source = new EventSource(`http://172.16.1.197:5000/chat/stream/${user_id}`);
+        const source = new EventSource(`http://172.30.1.44:5000/chat/stream/${user_id}`);
         setEventSource(source);
 
         source.onmessage = (event) => {

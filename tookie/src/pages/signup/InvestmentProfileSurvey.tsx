@@ -57,7 +57,7 @@ export const InvestmentProfileSurvey: React.FC = () => {
   const handleNext = async () => {
     if (isAnswersValid()) {
       try {
-        const response = await fetch('http://172.16.1.197:5000/api/user/create', {
+        const response = await fetch('http://172.30.1.44:5000/api/user/create', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
