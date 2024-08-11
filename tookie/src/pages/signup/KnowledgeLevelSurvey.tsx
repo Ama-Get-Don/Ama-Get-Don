@@ -196,12 +196,16 @@ export const KnowledgeLevelSurvey: React.FC = () => {
             <span>없거나 1년 미만</span>
           </CheckboxWrapper>
         </QuestionBox>
+        <div>
+      </div>
         <QuestionBox>
           <CheckboxWrapper onClick={() => handleCheckboxChange('experience', '1To5Years')}>
             <CheckboxImage src={answers.experience === '1To5Years' ? checkedImage : uncheckedImage} alt="checkbox" />
             <span>1년 이상 ~ 5년 미만</span>
           </CheckboxWrapper>
         </QuestionBox>
+        <div>
+      </div>
         <QuestionBox>
           <CheckboxWrapper onClick={() => handleCheckboxChange('experience', 'moreThan5Years')}>
             <CheckboxImage src={answers.experience === 'moreThan5Years' ? checkedImage : uncheckedImage} alt="checkbox" />
