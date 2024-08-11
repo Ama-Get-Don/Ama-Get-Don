@@ -26,8 +26,6 @@ export const Info: React.FC = () => {
     const handleGenderSelect = (gender: 'male' | 'female') => {
         setSelectedGender(gender);
         form.setFieldsValue({ gender });
-
-        // 선택된 성별에 따라 버튼을 활성화할지 결정
         setIsButtonEnabled(true);
     };
 

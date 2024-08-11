@@ -3,6 +3,7 @@ import { Button, Col, Row, Input, Space, message } from "antd";
 import styled from "styled-components";
 import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { useGlobalState } from '../../GlobalState.tsx'; // 추가된 부분
 import tookieSignIn from '../../assets/tookie_signin.png';
 
 export const SignIn = () => {
@@ -11,6 +12,7 @@ export const SignIn = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const { setGlobalState } = useGlobalState(); // 추가된 부분
 
   const handleLogin = async () => {
     if (!username || !password) {
@@ -35,6 +37,8 @@ export const SignIn = () => {
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem('token', data.access_token);
+        localStorage.setItem('user_id', data.user_id); 
+        setGlobalState(prev => ({ ...prev, user_id: data.user_id })); 
         message.success('로그인 성공!');
         navigate('/chat');
       } else {

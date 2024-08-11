@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 from user import user_router
-from chat import chat_router
+# from chat import chat_router
 
 app = FastAPI()
 
@@ -17,4 +17,4 @@ app.add_middleware(
 )
 
 app.include_router(user_router.router)
-app.include_router(chat_router.router)
+# app.include_router(chat_router.router)

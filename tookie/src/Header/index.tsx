@@ -15,6 +15,16 @@ const AppHeader: React.FC = () => {
     navigate('');
   };
 
+  const handleLogout = () => {
+    // 사용자 정보 초기화
+    localStorage.removeItem('userToken');
+    localStorage.removeItem('userInfo');  
+    // 필요한 경우 더 많은 초기화 작업 수행
+    
+    // 홈 화면으로 리디렉션
+    navigate('/');
+  };
+
   const isLoggedIn = location.pathname.includes('/chat'); // chat 경로에 있을 때만 로그인된 것으로 간주
 
   return (
@@ -25,6 +35,7 @@ const AppHeader: React.FC = () => {
       {isLoggedIn && (
         <ProfileWrapper>
           <Profile />
+          <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
         </ProfileWrapper>
       )}
     </HeaderStyled>
@@ -50,6 +61,22 @@ const LogoImage = styled.img`
 `;
 
 const ProfileWrapper = styled.div`
+  display: flex;
+  align-items: center;
   margin-left: auto;
   padding: 0 15px;
+`;
+
+const LogoutButton = styled.button`
+  margin-left: 15px;
+  padding: 5px 10px;
+  background-color: #f5222d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #ff4d4f;
+  }
 `;

@@ -24,6 +24,7 @@ interface InvestmentPreferenceCreateState {
 interface GlobalState {
   user_create: UserCreateState;
   investmentPreference_create: InvestmentPreferenceCreateState;
+  user_id: number | null; 
 }
 
 interface GlobalContextType extends GlobalState {
@@ -54,6 +55,7 @@ const initialInvestmentPreferenceCreateState: InvestmentPreferenceCreateState = 
 const initialState: GlobalState = {
   user_create: initialUserCreateState,
   investmentPreference_create: initialInvestmentPreferenceCreateState,
+  user_id: null, 
 };
 
 const GlobalContext = createContext<GlobalContextType>({
