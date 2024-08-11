@@ -60,5 +60,6 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(),
     return {
         "access_token": access_token,
         "token_type": "bearer",
-        "user_id": user.user_id
+        "user_id": user.user_id,
+        "investment_level":user.investment_level
     }

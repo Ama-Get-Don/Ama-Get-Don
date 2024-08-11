@@ -2,8 +2,9 @@ from database import get_db
 from models import *
 from sqlalchemy.orm import Session
 from pymongo import MongoClient
+from config.config import *
 def ConnectMongoDB():
-    client = MongoClient("mongodb://localhost:27017")
+    client = MongoClient(MONGO_LOCATION)
     mydb = client["tookie-db"]
     mycol = mydb["chat"]
     return mycol

@@ -97,9 +97,10 @@ async def stream(user_id: int):
 
                 # 3) core_Chain의 결과를 LLM이 종합(스트리밍 형태로 전송)
                 full_response = ""
-                for llm_token in llm.stream(f"{rag_answer}와\n{agent_answer}와\n{company_answer}의 내용을 종합해주세요!"):
+                for llm_token in llm.stream(f"{rag_answer}\n\n{agent_answer}\n\n{company_answer}의 내용을 종합해주세요!"):
                     yield f"data: {llm_token.content}\n\n"
                     full_response += llm_token.content
+                yield "data: END\n\n"
 
                 # 전체 응답을 core_Store 함수에 전달
                 core_Store(new_user_chat.replace("Previous Question and Answer Summary", "").replace("Present User Question:", ""), full_response)

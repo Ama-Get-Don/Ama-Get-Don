@@ -84,11 +84,19 @@ async def core_Chain(question, investment_level, user_info):
             # 추출한 단어 기반으로 정보 GET(재무제표)
             # 해당 회사의 재무제표 파일을 임베딩해서 넣는다.
             for company in extracted_company:
-                file_path = (f"./financial_statements/{company}.pdf")
-                loader = PyPDFLoader(file_path)
-                documents = loader.load()
-                for document in documents:
-                    company_info += document.page_content
+                file_path = f"./financial_statements/{company}.pdf"
+
+                # 파일이 존재하는지 확인
+                if os.path.exists(file_path):
+                    try:
+                        loader = PyPDFLoader(file_path)
+                        documents = loader.load()
+                        for document in documents:
+                            company_info += document.page_content
+                    except Exception as e:
+                        print(f"An error occurred while processing {file_path}: {e}")
+                else:
+                    print(f"File {file_path} does not exist.")
 
         ### 3> 사용자 수준별로 다르게 회사정보 기반으로 질의
         # 사용자 수준 별 다른 프롬프트 제공 (사용자에 대한 정보를 반영하여 맞춤형 답변을 준다)
