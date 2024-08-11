@@ -5,6 +5,10 @@ import sendButtonDark from '/src/assets/sendButtonDark.png';
 import sendButtonLight from '/src/assets/sendButtonLight.png';
 import { beginnerQuestions, intermediateQuestions, advancedQuestions, Question } from './questions';
 import { useGlobalState } from '../../GlobalState.tsx'; 
+import seedChatImage from '/src/assets/seed_chat.png';
+import sproutChatImage from '/src/assets/sprout_chat.png';
+import tookieChatImage from '/src/assets/tookie_chat.png';
+
 
 const { Content } = Layout;
 const { TextArea } = Input;
@@ -163,6 +167,19 @@ export const Chat = () => {
     const [showWelcomeScreen, setShowWelcomeScreen] = useState(true);
     const [recommendedQuestions, setRecommendedQuestions] = useState<Question[]>([]);
     
+    // Avatar 이미지를 결정하는 함수
+    const getAvatarImage = () => {
+        if (user_create.investment_level === 1) {
+            return seedChatImage;
+        } else if (user_create.investment_level === 2) {
+            return sproutChatImage;
+        } else if (user_create.investment_level === 3) {
+            return tookieChatImage;
+        } else {
+            return null;
+        }
+    };
+
     useEffect(() => {
         const getRandomQuestions = (questions: Question[], num: number) => {
             return questions.sort(() => 0.5 - Math.random()).slice(0, num);
@@ -247,8 +264,6 @@ export const Chat = () => {
         }
     };
 
-    // console.log(`investment_level: ${user_create.investment_level}`)
-
     const handleStartChat = (question: Question) => {
         setShowWelcomeScreen(false);
 
@@ -302,7 +317,7 @@ export const Chat = () => {
                         <WelcomeScreen>
                             <WelcomeContent>
                                 <AvatarWrapper>
-                                    <AvatarIcon />
+                                    <AvatarIcon style={{ backgroundImage: `url(${getAvatarImage()})`, backgroundSize: 'cover' }} />
                                 </AvatarWrapper>
                                 <WelcomeMessage>주식 관련 메시지를 입력하시거나, 아래 추천 질문을 클릭해주세요.</WelcomeMessage>
                                 <ButtonWrapper>
