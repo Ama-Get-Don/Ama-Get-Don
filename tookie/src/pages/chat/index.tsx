@@ -246,6 +246,8 @@ export const Chat = () => {
         }
     };
 
+    // console.log(`investment_level: ${user_create.investment_level}`)
+
     const handleStartChat = (question: Question) => {
         setShowWelcomeScreen(false);
 
