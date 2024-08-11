@@ -16,6 +16,7 @@ import asyncio
 
 from chat.Multi_Turn.core_Store import *
 
+
 llm= ChatOpenAI(
     temperature=0.1,
     model_name = "gpt-4o",
@@ -27,6 +28,7 @@ router = APIRouter(
 
 backend_json = {}  # 클라이언트에 넘길 데이터
 
+coll = ConnectMongoDB()
 
 # JSON에 사용자 정보 담는다(POST)
 @router.post("")
@@ -101,6 +103,7 @@ async def stream(user_id: int):
 
                 # 전체 응답을 core_Store 함수에 전달
                 core_Store(new_user_chat.replace("Previous Question and Answer Summary", "").replace("Present User Question:", ""), full_response)
+                insert_one(coll, user_id, new_user_chat, full_response)
                 break  # 한 번 응답을 보낸 후 종료
             await asyncio.sleep(1)
 

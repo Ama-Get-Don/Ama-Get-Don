@@ -14,6 +14,9 @@ from user.user_crud import pwd_context
 from user.settings import SECRET_KEY
 
 
+import pymongo
+
+
 #JWT 설정
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 SECRET_KEY = SECRET_KEY
@@ -57,5 +60,5 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(),
     return {
         "access_token": access_token,
         "token_type": "bearer",
-        "tookie_id": user.tookie_id
+        "user_id": user.user_id
     }

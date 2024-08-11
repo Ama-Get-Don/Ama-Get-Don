@@ -48,4 +48,4 @@ class InvestmentPreferenceCreate(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
-    tookie_id: str
+    user_id: int
