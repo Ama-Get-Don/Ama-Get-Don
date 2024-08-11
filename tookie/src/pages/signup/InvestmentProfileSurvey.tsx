@@ -152,6 +152,8 @@ export const InvestmentProfileSurvey: React.FC = () => {
             <span>투자 원금은 반드시 보전</span>
           </CheckboxWrapper>
         </QuestionBox>
+        <div>
+        </div>
         <QuestionBox>
           <CheckboxWrapper onClick={() => handleCheckboxChange('riskTolerance', 'moderateTolerance')}>
             <CheckboxImage
@@ -161,6 +163,8 @@ export const InvestmentProfileSurvey: React.FC = () => {
             <span>약간의 손실 감수 가능</span>
           </CheckboxWrapper>
         </QuestionBox>
+        <div>
+        </div>
         <QuestionBox>
           <CheckboxWrapper onClick={() => handleCheckboxChange('riskTolerance', 'highTolerance')}>
             <CheckboxImage
@@ -185,6 +189,8 @@ export const InvestmentProfileSurvey: React.FC = () => {
             <span>10% 미만</span>
           </CheckboxWrapper>
         </QuestionBox>
+        <div>
+        </div>
         <QuestionBox>
           <CheckboxWrapper onClick={() => handleCheckboxChange('investmentRatio', '10To30')}>
             <CheckboxImage
@@ -194,6 +200,8 @@ export const InvestmentProfileSurvey: React.FC = () => {
             <span>10% 이상 ~ 30% 미만</span>
           </CheckboxWrapper>
         </QuestionBox>
+        <div>
+        </div>
         <QuestionBox>
           <CheckboxWrapper onClick={() => handleCheckboxChange('investmentRatio', 'moreThan30')}>
             <CheckboxImage
@@ -218,6 +226,8 @@ export const InvestmentProfileSurvey: React.FC = () => {
             <span>1년 미만</span>
           </CheckboxWrapper>
         </QuestionBox>
+        <div>
+        </div>
         <QuestionBox>
           <CheckboxWrapper onClick={() => handleCheckboxChange('investmentPeriod', '1To5Years')}>
             <CheckboxImage
@@ -227,6 +237,8 @@ export const InvestmentProfileSurvey: React.FC = () => {
             <span>1년 이상 ~ 5년 미만</span>
           </CheckboxWrapper>
         </QuestionBox>
+        <div>
+        </div>
         <QuestionBox>
           <CheckboxWrapper onClick={() => handleCheckboxChange('investmentPeriod', 'moreThan5Years')}>
             <CheckboxImage
@@ -251,6 +263,8 @@ export const InvestmentProfileSurvey: React.FC = () => {
             <span>정기적 수입이 있으며, 향후 현재 수준의 유지 또는 증가가 예상됨</span>
           </CheckboxWrapper>
         </QuestionBox>
+        <div>
+        </div>
         <QuestionBox>
           <CheckboxWrapper onClick={() => handleCheckboxChange('incomeSource', 'stableIncome')}>
             <CheckboxImage
@@ -260,6 +274,8 @@ export const InvestmentProfileSurvey: React.FC = () => {
             <span>정기적 수입이 있으나, 향후 감소 또는 불안정이 예상됨</span>
           </CheckboxWrapper>
         </QuestionBox>
+        <div>
+        </div>
         <QuestionBox>
           <CheckboxWrapper onClick={() => handleCheckboxChange('incomeSource', 'noIncome')}>
             <CheckboxImage
@@ -284,6 +300,8 @@ export const InvestmentProfileSurvey: React.FC = () => {
             <span>1년 미만</span>
           </CheckboxWrapper>
         </QuestionBox>
+        <div>
+        </div>
         <QuestionBox>
           <CheckboxWrapper onClick={() => handleCheckboxChange('derivativeExperience', '1To3Years')}>
             <CheckboxImage
@@ -293,6 +311,8 @@ export const InvestmentProfileSurvey: React.FC = () => {
             <span>1년 이상 ~ 3년 미만</span>
           </CheckboxWrapper>
         </QuestionBox>
+        <div>
+        </div>
         <QuestionBox>
           <CheckboxWrapper onClick={() => handleCheckboxChange('derivativeExperience', 'moreThan3Years')}>
             <CheckboxImage
