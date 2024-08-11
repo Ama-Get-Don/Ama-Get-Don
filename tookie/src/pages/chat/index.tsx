@@ -159,7 +159,7 @@ const MessageBubble = styled.div<{ sender: 'user' | 'bot' }>`
 `;
 
 export const Chat = () => {
-    const { user_create, user_id } = useGlobalState();
+    const { user_create } = useGlobalState();
     const [messages, setMessages] = useState<Message[]>(initialMessages);
     const [input, setInput] = useState('');
     const [eventSource, setEventSource] = useState<EventSource | null>(null);
