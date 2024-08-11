@@ -9,17 +9,17 @@ async def tookie(input, user_info, company_info):
 
         [투자자의 정보]
         1) 투자목적
-        {user_info.investment_goal}
+        {user_info.get('investment_goal', '')}
         2) 위험감수능력
-        {user_info.risk_tolerance}
+        {user_info.get('risk_tolerance', '')}
         3) 투자비중
-        {user_info.investment_ratio}
+        {user_info.get('investment_ratio', '')}
         4) 투자 기간
-        {user_info.investment_period}
+        {user_info.get('investment_period', '')}
         5) 소득 상태
-        {user_info.income_status}
+        {user_info.get('income_status', '')}
         6) 투자 경험
-        {user_info.derivatives_experience}
+        {user_info.get('derivatives_experience', '')}
 
         [회사의 재무제표]
         {company_info}
