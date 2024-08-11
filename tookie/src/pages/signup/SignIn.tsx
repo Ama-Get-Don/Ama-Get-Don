@@ -38,6 +38,7 @@ export const SignIn = () => {
         const data = await response.json();
         localStorage.setItem('token', data.access_token);
         localStorage.setItem('user_id', data.user_id); 
+        localStorage.setItem('investment_level', data.investment_level); 
         setGlobalState(prev => ({ ...prev, user_id: data.user_id })); 
         message.success('로그인 성공!');
         navigate('/chat');
