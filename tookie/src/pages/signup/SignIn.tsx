@@ -12,7 +12,7 @@ export const SignIn = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const { setGlobalState } = useGlobalState(); // 추가된 부분
+  const { setGlobalState } = useGlobalState(); 
 
   const handleLogin = async () => {
     if (!username || !password) {
@@ -39,7 +39,17 @@ export const SignIn = () => {
         localStorage.setItem('token', data.access_token);
         localStorage.setItem('user_id', data.user_id); 
         localStorage.setItem('investment_level', data.investment_level); 
-        setGlobalState(prev => ({ ...prev, user_id: data.user_id })); 
+
+        // 전역 상태 업데이트
+        setGlobalState(prev => ({
+          ...prev,
+          user_id: data.user_id,
+          user_create: {
+            ...prev.user_create,
+            investment_level: data.investment_level,  // investment_level을 설정
+          }
+        }));
+
         message.success('로그인 성공!');
         navigate('/chat');
       } else {
