@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Input, Layout, List, Avatar } from 'antd';
 import styled from 'styled-components';
 import sendButtonDark from '/src/assets/sendButtonDark.png';
@@ -223,7 +223,7 @@ export const Chat = () => {
 
         }
         setIsMessageEnd(false)
-    }, [isMessageEnd]);
+    }, [isMessageEnd, messages.length, partialMessage]);
 
     const handleSend = async () => {
         if (input.trim()) {
@@ -243,7 +243,7 @@ export const Chat = () => {
             // }
 
             try {
-                const response = await fetch('http://172.30.1.44:5000/chat', {
+                const response = await fetch('http://localhost:5000/chat', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json; charset=utf-8',
@@ -297,7 +297,7 @@ export const Chat = () => {
             return;
         }
 
-        const source = new EventSource(`http://172.30.1.44:5000/chat/stream/${user_id}`);
+        const source = new EventSource(`http://localhost:5000/chat/stream/${user_id}`);
         setEventSource(source);
 
         source.onmessage = (event) => {

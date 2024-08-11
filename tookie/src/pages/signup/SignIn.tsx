@@ -23,7 +23,7 @@ export const SignIn = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://172.30.1.44:5000/api/user/login', {
+      const response = await fetch('http://localhost:5000/api/user/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
