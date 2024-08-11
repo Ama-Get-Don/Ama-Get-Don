@@ -15,6 +15,7 @@ import sproutOffImage from '../../assets/sprout_off.png';
 import tookieOnImage from '../../assets/tookie_on.png';
 import tookieOffImage from '../../assets/tookie_off.png';
 import arrowImage from '../../assets/Arrow.png';
+import { useGlobalState } from '../../GlobalState.tsx'; 
 
 const Profile: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -23,6 +24,7 @@ const Profile: React.FC = () => {
   const [avatarImage, setAvatarImage] = useState<string>(maleImage);
   const [growthStage, setGrowthStage] = useState<string>('seed'); // 성장 단계 상태
   const navigate = useNavigate();
+  const { setGlobalState } = useGlobalState();
 
   // 성별 정보 받아오는 useEffect
   useEffect(() => {
@@ -52,14 +54,33 @@ const Profile: React.FC = () => {
       localStorage.removeItem('token');
       localStorage.removeItem('user_id');
       localStorage.removeItem('investment_level');
-      
-      // 삭제된 정보 확인
-      console.log('token after logout:', localStorage.getItem('token'));
-      console.log('user_id after logout:', localStorage.getItem('user_id'));
-      console.log('investment_level after logout:', localStorage.getItem('investment_level'));
-  
+
+      // 전역 상태 초기화
+      setGlobalState({
+        user_create: {
+          tookie_id: '',
+          name: '',
+          password1: '',
+          password2: '',
+          email: '',
+          phone_number: '',
+          birth: '',
+          gender: '',
+          investment_level: 0,
+        },
+        investmentPreference_create: {
+          investment_goal: '',
+          risk_tolerance: '',
+          investment_ratio: '',
+          investment_period: '',
+          income_status: '',
+          derivatives_experience: '',
+        },
+        user_id: null,
+      });
+
       // 로그아웃 후 홈 화면으로 이동
-      await new Promise(resolve => setTimeout(resolve, 100)); // 혹시나 하는 딜레이 추가
+      await new Promise(resolve => setTimeout(resolve, 100));
       navigate('/');
     }
   };

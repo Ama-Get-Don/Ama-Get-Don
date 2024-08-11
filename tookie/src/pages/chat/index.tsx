@@ -162,23 +162,24 @@ export const Chat = () => {
     const [isChatEnd, setIsChatEnd] = useState(false);
     const [showWelcomeScreen, setShowWelcomeScreen] = useState(true);
     const [recommendedQuestions, setRecommendedQuestions] = useState<Question[]>([]);
-
+    
     useEffect(() => {
         const getRandomQuestions = (questions: Question[], num: number) => {
             return questions.sort(() => 0.5 - Math.random()).slice(0, num);
         };
-
-        // investment_level에 따른 추천 질문 설정
+    
         let selectedQuestions: Question[] = [];
-
+    
         if (user_create.investment_level === 1) {
             selectedQuestions = getRandomQuestions(beginnerQuestions, 3);
         } else if (user_create.investment_level === 2) {
             selectedQuestions = getRandomQuestions(intermediateQuestions, 3);
         } else if (user_create.investment_level === 3) {
             selectedQuestions = getRandomQuestions(advancedQuestions, 3);
+        } else {
+            console.error('investment_level 값이 유효하지 않습니다:', user_create.investment_level);
         }
-
+    
         setRecommendedQuestions(selectedQuestions);
     }, [user_create.investment_level]);
 
