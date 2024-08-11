@@ -29,25 +29,30 @@ export const SignUpComplete = () => {
       </SeedlingWrapper>
       <Title>회원가입 완료!</Title>
       <Description>
+        <strong>
         {userName}님은 ‘{investmentStageName}’ 단계입니다.
         <br />
-        투키와 함께 주식 투자 능력을 키워봐요!
+        투키와 함께 주식 투자 능력을 키워봐요!</strong>
         <br />
         <SmallText>(내 정보 설정 창에서 성장 단계를 직접 변경할 수 있어요)</SmallText>
       </Description>
-      <StyledButton onClick={handleLogin}>
-        대화 시작하기
+      <StyledButton
+      shape="round"
+      onClick={handleLogin}
+      style={{ height: '40px' }}
+      >
+        로그인으로 가기
       </StyledButton>
     </Container>
   );
 };
 
 const Container = styled.div`
+  min-height: 90vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
   background-color: white;
   padding: 20px;
   font-family: 'Pretendard', sans-serif;
@@ -69,13 +74,13 @@ const Seedling = styled.img`
 `;
 
 const Title = styled.h1`
-  font-size: 32px;
+  font-size: 30px;
   color: #333;
   margin-bottom: 10px;
 `;
 
 const Description = styled.p`
-  font-size: 20px;
+  font-size: 15px;
   color: #333;
   text-align: center;
   margin-bottom: 20px;
@@ -91,7 +96,7 @@ const StyledButton = styled(Button)`
   border-color: #6ddd89 !important;
   color: white !important;
   margin-top: 20px;
-  width: 200px;
+  width: 300px;
   font-size: 16px !important;
 
   &:hover {
