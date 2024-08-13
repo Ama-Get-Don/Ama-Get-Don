@@ -8,7 +8,7 @@
 - **씨앗 -> 새순 -> 투키**
 ![Character](readme_images/character.png)
 
-### 사용자 흐름 (User Flow)
+### 사용자 흐름 (User-Flow)
 사용자의 흐름은 다음과 같습니다.
 
 ![User Flow](readme_images/user_flow.png)
@@ -25,7 +25,7 @@
    - 개인정보를 확인 및 수정
    - 로그아웃 또는 캐릭터 성장 단계를 직접 변경
 
-### 챗봇 흐름 (Chatbot Flow)
+### 챗봇 흐름 (Chatbot-Flow)
 ![Chatbot Flow](readme_images/chatbot_flow.png)
 
 사용자의 질문을 처리하는 시스템을 두 가지 카테고리로 나눕니다:
