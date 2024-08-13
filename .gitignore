@@ -1,0 +1,14 @@
+myvenv/
+tookie-BE/config/
+__pycache__/
+.idea/
+tookie-BE/init_db.py
+
+tookie-BE/data/
+new_chroma_db/
+venv/
+alembic.ini
+.env
+*.sql
+financial_statements/
+alembic/
