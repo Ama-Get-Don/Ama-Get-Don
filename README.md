@@ -1,12 +1,15 @@
-# Ama-Get-Don
+# Tookie
+![Main Page](readme_images/main.png)
+투키(TOOKIE)는 ‘투자 능력 키우기’를 목표로 한 서비스로, 말풍선 안에 주식 그래프가 그려진 로고를 사용합니다. 
+스투키(식물) 캐릭터를 성장시키는 컨셉으로, 회원 가입 시 선택한 답변에 따라 첫 레벨이 결정됩니다. 
+레벨은 투자 초급자(씨앗), 투자 중급자(새순), 투자 고급자(투키)로 나뉘며, 캐릭터의 레벨에 따라 챗봇의 답변 수준이 달라집니다. 사용자는 원하는 대로 성장 단계를 변경할 수 있으며, 향후 챗봇 대화량이나 중간 설문 등의 지표를 통해 투자 능력이 성장했다고 판단되면 자동으로 레벨업이 이루어질 예정입니다.
 
-
-
-## UI 개요
+### Tookie 캐릭터
+- **씨앗 -> 새순 -> 투키**
+![Character](readme_images/character.png)
 
 ### 사용자 흐름 (User Flow)
-
-주요 단계는 다음과 같습니다.
+사용자의 흐름은 다음과 같습니다.
 
 ![User Flow](readme_images/user_flow.png)
 
@@ -22,33 +25,31 @@
    - 개인정보를 확인 및 수정
    - 로그아웃 또는 캐릭터 성장 단계를 직접 변경
 
-### UI 컨셉
-- ‘투’자 능력 ‘키’우기 -> 서비스명: 투키(TOOKIE), 로고 설명(말풍선 안에 주식 그래프)
-- 스투키(식물) 캐릭터를 성장시켜 나가는 컨셉
-- 회원 가입 시 선택한 답변에 따라 첫 레벨이 결정됨
-- 투자 초급자(씨앗) -> 투자 중급자(새순) -> 투자 고급자(투키)
-- 캐릭터 레벨에 따라 제공되는 챗봇의 답변 수준이 달라짐
-- 구현(첫 레벨이 결정되고, 사용자가 원하는 대로 성장 단계를 변경할 수 있음)
-- 향후 계획(챗봇 대화량이나 중간 설문 등 구체적인 지표를 설정하여 사용자의 투자 능력이 성장되었다고 판단된다면 자동 레벨업)
+### 챗봇 흐름 (Chatbot Flow)
+![Chatbot Flow](readme_images/chatbot_flow.png)
 
-### UI 디자인
-- ‘성장’, ‘식물’ 이라는 컨셉 키워드에 따라 초록색을 대표 색상으로 설정
-- 전체적으로 사용하기 쉽고 깔끔한 UI
+사용자의 질문을 처리하는 시스템을 두 가지 카테고리로 나눕니다:
+1. **법과 관련된 질문:**
+- 할루시네이션 발생을 방지하고 정확한 답변을 제공하기 위해 RAG(참조와 생성) 방식을 사용합니다.
 
-### UI 캐릭터
-- **씨앗 -> 새순 -> 투키**
-![Character](readme_images/character.png)
+2. **그 외의 질문:**
 
-### UI 화면 
+- 사용자의 투자 수준별로 맞춤형 답변을 제공하기 위해 프롬프트에 다음 정보를 포함합니다:
+
+1) 처음 가입 시 입력받은 사용자의 투자 성향 정보
+2) 사용자의 질문
+3) 회사의 재무제표
+
+- LLM(대형 언어 모델)에 Training되지 않은 정보를 질문할 경우, self-ask-with-search 방식을 통해 LLM이 직접 SERP API를 사용하여 검색 후 답변을 제공합니다.
+
+
+### UI 소개
 
 다음은 주요 인터페이스의 화면입니다.
 
-1. **메인 페이지**: ![Main Page](readme_images/main.png)
-   - 로그인 또는 회원가입 옵션이 있는 메인 랜딩 페이지
-   - 깔끔하고 최소한의 디자인으로 사용자가 다음 단계로 쉽게 진행할 수 있도록 유도
-2. **로그인 페이지**: ![Login Page](readme_images/login.png)
+1. **로그인 페이지**: ![Login Page](readme_images/login.png)
    - 기존 사용자를 위한 간단하고 직관적인 로그인 인터페이스
-3. **회원가입 페이지**: 
+2. **회원가입 페이지**: 
    <div style="display: flex; justify-content: space-between;">
       <img src="readme_images/survey_1.png" alt="Sign-Up Page 2" width="45%">
       <img src="readme_images/survey_2.png" alt="Sign-Up Page 3" width="45%">
@@ -57,11 +58,11 @@
    - **약관 동의**: 사용자는 약관에 동의해야 합니다.
    - **개인정보 입력**: 사용자가 개인 정보를 입력합니다.
    - **설문조사**: 사용자의 지식 수준과 투자 상황에 대한 두 가지 설문조사를 진행합니다.
-4. **챗봇 채팅 페이지**: ![Chatbot Chat Page 1](readme_images/chat_1.png)
+3. **챗봇 채팅 페이지**: ![Chatbot Chat Page 1](readme_images/chat_1.png)
    ![Chatbot Chat Page 2](readme_images/chat_2.png)
    - 사용자 지식 수준에 따라 추천 질문이 제시됩니다
    - 챗봇을 통해 사용자에 맞게 투자를 조언 받을 수 있습니다. 
-5. **내 정보 페이지**: ![User Information Page](readme_images/user_info.png)
+4. **내 정보 페이지**: ![User Information Page](readme_images/user_info.png)
    - 사용자는 자신의 개인정보를 확인하고 수정할 수 있습니다.
    - 사용자는 인터페이스를 통해 캐릭터의 성장 단계를 직접 변경할 수 있어, 개인화된 경험을 제공합니다.
 
