@@ -2,6 +2,9 @@
 ![Main Page](readme_images/main.png)
 > 투키(Tookie)는 투자자의 데이터를 기반으로 주식투자와 관련한 질문에 답변을 제공하는 AI 챗봇 서비스 입니다. 투키는 투자자의 투자성향을 바탕으로 답변을 제공할 수 있습니다.
 
+### 팀원 소개 및 역할
+![Team](readme_images/team.png)
+
 ### Tookie 캐릭터
 - **씨앗 -> 새순 -> 투키**
 ![Character](readme_images/character.png)
