@@ -12,15 +12,11 @@ from database import get_db
 from user import user_crud, user_schema
 from user.user_crud import pwd_context
 from user.settings import SECRET_KEY
-
+from user.auth import *
 
 import pymongo
 
 
-#JWT 설정
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
-SECRET_KEY = SECRET_KEY
-ALGORITHM = "HS256"
 
 
 router = APIRouter(
@@ -51,11 +47,7 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(),
         )
 
     # make access token
-    data = {
-        "sub": user.tookie_id,
-        "exp": datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    }
-    access_token = jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
+    access_token = create_access_token(user.tookie_id)
 
     return {
         "access_token": access_token,
