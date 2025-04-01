@@ -1,20 +1,11 @@
-from datetime import timedelta, datetime
-
 from fastapi import APIRouter, HTTPException
 from fastapi import Depends
 from sqlalchemy.orm import Session
-from starlette import status
 from fastapi.security import OAuth2PasswordRequestForm
-from jose import jwt
-from config.config import *
-
 from database import get_db
 from user import user_crud, user_schema
 from user.user_crud import pwd_context
-from user.settings import SECRET_KEY
 from user.auth import *
-
-import pymongo
 
 
 
@@ -47,11 +38,8 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(),
         )
 
     # make access token
-    access_token = create_access_token(user.tookie_id)
+    access_token = create_access_token(
+        payload = {"user_id": user.tookie_id, "user_level":user.investment_level}, role=Role.USER,
+    )
 
-    return {
-        "access_token": access_token,
-        "token_type": "bearer",
-        "user_id": user.user_id,
-        "investment_level":user.investment_level
-    }
+    return {"access_token": access_token, "token_type":"bearer"}
