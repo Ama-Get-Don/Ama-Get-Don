@@ -39,7 +39,7 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(),
 
     # make access token
     access_token = create_access_token(
-        payload = {"user_id": user.tookie_id, "user_level":user.investment_level}, role=Role.USER,
+        payload = {"user_id": user.user_id, "user_level":user.investment_level}, role=Role.USER,
     )
 
     return {"access_token": access_token, "token_type":"bearer"}

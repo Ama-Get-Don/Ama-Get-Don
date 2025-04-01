@@ -6,7 +6,7 @@ from chat.Multi_Turn.core_Store import *
 
 from chat.chat_crud import *
 from fastapi import Depends
-
+from typing import Annotated
 from chat.Chain.core_Chain import *
 from chat.RAG.core_Rag import *
 
@@ -16,6 +16,7 @@ import asyncio
 
 from chat.Multi_Turn.core_Store import *
 
+from user.auth import get_current_user, CurrentUser
 
 llm= ChatOpenAI(
     temperature=0.1,
@@ -32,18 +33,17 @@ coll = ConnectMongoDB()
 
 # JSON에 사용자 정보 담는다(POST)
 @router.post("")
-async def create_message(message: user_Message, db: Session = Depends(get_db)):  # user_Message 형태로 매핑
+async def create_message(message: user_Message, current_user: Annotated[CurrentUser, Depends(get_current_user)], db: Session = Depends(get_db)):  # user_Message 형태로 매핑
 
     # 사용자 관련 정보
-    ## 1) user_id 추출
-    user_id = message.user_id
+    ## 1) 토큰에서 user_id 추출
+    user_id = current_user.id
+    ## 1) 토큰에서 investment_level 추출
+    investment_level = current_user.level
 
-    ## 2) user_chat 추출
+    ## 2) 메시지에서 user_chat 추출
     user_chat = message.user_chat
-
-    ## 3) investment_level 추출
-    investment_level = message.investment_level
-    
+    print(user_id, investment_level, user_chat)
     ## 3) 쿼리 날려서 사용자 정보 추출
     # 관계형 DB에 쿼리 날려서 user_info 자료구조 생성 -> 사용자에 대한 정보
     user_info = get_UserInfo(db, user_id)
@@ -64,11 +64,12 @@ async def create_message(message: user_Message, db: Session = Depends(get_db)): 
     }
     '''
 
-    backend_json[message.user_id] = {
+    backend_json[user_id] = {
         "user_chat": user_chat,
         "user_info": user_info,
         "investment_level":investment_level
     }
+    print(backend_json[user_id])
 
     return JSONResponse(content={"status": "ok"}, media_type="application/json; charset=utf-8")
 
