@@ -25,7 +25,7 @@ def user_create(user_create: user_schema.UserCreate, investmentPreference_create
 
 
 @router.post("/login", response_model=user_schema.Token)
-def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(),
+def login_users(form_data: OAuth2PasswordRequestForm = Depends(),
                            db: Session = Depends(get_db)):
 
     # check user and password
@@ -42,4 +42,11 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(),
         payload = {"user_id": user.user_id, "user_level":user.investment_level}, role=Role.USER,
     )
 
-    return {"access_token": access_token, "token_type":"bearer"}
+    # make refresh token
+    refresh_token = create_refresh_token(
+        payload = {"user_id": user.user_id, "user_level":user.investment_level}, role=Role.USER,
+    )
+
+    # 인메모리 DB에 저장
+
+    return {"access_token": access_token, "refresh_token": refresh_token, "token_type":"bearer"}
