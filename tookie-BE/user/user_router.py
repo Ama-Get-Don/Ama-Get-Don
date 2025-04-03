@@ -7,8 +7,7 @@ from user import user_crud, user_schema
 from user.user_crud import pwd_context
 from user.auth import *
 
-
-
+from database import redis_config
 
 router = APIRouter(
     prefix="/api/user",
@@ -26,9 +25,9 @@ def user_create(user_create: user_schema.UserCreate, investmentPreference_create
 
 @router.post("/login", response_model=user_schema.Token)
 def login_users(form_data: OAuth2PasswordRequestForm = Depends(),
-                           db: Session = Depends(get_db)):
+                           db: Session = Depends(get_db), rd=Depends(redis_config)):
 
-    # check user and password
+    # id, pw 검증
     user = user_crud.get_id(db, form_data.username)
     if not user or not pwd_context.verify(form_data.password, user.password):
         raise HTTPException(
@@ -37,16 +36,24 @@ def login_users(form_data: OAuth2PasswordRequestForm = Depends(),
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    # make access token
+    # 액세스 토큰 발급
     access_token = create_access_token(
         payload = {"user_id": user.user_id, "user_level":user.investment_level}, role=Role.USER,
     )
 
-    # make refresh token
+    # 리프레시 토큰 발급
     refresh_token = create_refresh_token(
         payload = {"user_id": user.user_id, "user_level":user.investment_level}, role=Role.USER,
     )
 
-    # 인메모리 DB에 저장
-
+    # 인메모리 DB에 저장(기존에 만료된 리프레시 토큰 있어도 덮어쓰기)
+    rd.set(user.user_id, refresh_token)
     return {"access_token": access_token, "refresh_token": refresh_token, "token_type":"bearer"}
+
+@router.post("/refresh", response_model=user_schema.ReToken) # 리프레시 토큰으로 액세스 토큰 재발급하는 엔드포인트
+def login_users(refresh_token: str):
+    payload = decode_refresh_token(refresh_token)
+    new_access_token = create_access_token(
+        payload = {"user_id": payload.get("user_id"), "user_level" : payload.get("user_level")}, role=Role.USER,
+    )
+    return {"access_token": new_access_token, "token_type":"bearer"}

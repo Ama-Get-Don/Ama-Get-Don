@@ -9,6 +9,7 @@ from fastapi.security import OAuth2PasswordBearer
 from typing import Annotated
 from fastapi import Depends, HTTPException, status
 
+from database import *
 
 #JWT 설정
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
@@ -36,19 +37,34 @@ def create_refresh_token(payload:dict, role:Role):
     )
     refresh_token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
     return refresh_token
-
-
-def decode_access_token(token: str):
-    # 인증(만료기한까지)
+def decode_access_token(access_token: str): # 액세스 토큰 인증
     try:
-        return jwt.decode(token, SECRET_KEY)
+        payload = jwt.decode(access_token, SECRET_KEY)
+        return payload
     except ExpiredSignatureError: # 만료기한 초과
-        # 1) 인메모리 DB에서 액세스 토큰 검색
-        # 2) 만약 있으면 리프레시 토큰의 만료기간 확인 후, 액세스 토큰 재발급 -> 인메모리 DB에서 키값(액세스 토큰)수정
-        # 2) 만약 리프레시 토큰도 만료 되었으면 재로그인 요청 -> 인메모리 DB에서 해당 값 삭제
-
-    except: # 인메모리 DB에 엑세스 토큰 없는 경우(재로그인)
-        raise HTTPException(status_code = status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Access token expired. Please use /refresh with your Refresh token."
+        )
+    except JWTError:
+        raise HTTPException(
+            status_code = status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token"
+        )
+def decode_refresh_token(refresh_token: str): # 리프레시 토큰 인증
+    try:
+        payload = jwt.decode(refresh_token, SECRET_KEY)
+        return payload
+    except ExpiredSignatureError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Refresh token expired. Please re-login."
+        )
+    except JWTError:
+        raise HTTPException(
+            status_code = status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token"
+        )
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/user/login")
 
