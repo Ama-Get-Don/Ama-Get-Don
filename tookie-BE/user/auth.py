@@ -12,8 +12,8 @@ from fastapi import Depends, HTTPException, status, Request
 from database import *
 
 #JWT 설정
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
-REFRESH_TOKEN_EXPIRE_DAYS = 2
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 2
+REFRESH_TOKEN_EXPIRE_DAYS = 14
 SECRET_KEY = SECRET_KEY
 ALGORITHM = "HS256"
 class Role(StrEnum):
