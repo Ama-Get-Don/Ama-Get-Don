@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from fastapi import Depends
+from fastapi import Response
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
 from database import get_db
@@ -24,9 +25,8 @@ def user_create(user_create: user_schema.UserCreate, investmentPreference_create
 
 
 @router.post("/login", response_model=user_schema.Token)
-def login_users(form_data: OAuth2PasswordRequestForm = Depends(),
+def login_users(response:Response, form_data: OAuth2PasswordRequestForm = Depends(),
                            db: Session = Depends(get_db), rd=Depends(redis_config)):
-
     # id, pw 검증
     user = user_crud.get_id(db, form_data.username)
     if not user or not pwd_context.verify(form_data.password, user.password):
@@ -48,10 +48,26 @@ def login_users(form_data: OAuth2PasswordRequestForm = Depends(),
 
     # 인메모리 DB에 저장(기존에 만료된 리프레시 토큰 있어도 덮어쓰기)
     rd.set(user.user_id, refresh_token)
-    return {"access_token": access_token, "refresh_token": refresh_token, "token_type":"bearer"}
+
+    response.set_cookie(
+        key="access_token",
+        value = access_token,
+        httponly=True,
+        secure=True,
+        samesite="None"
+    )
+
+    response.set_cookie(
+        key="refresh_token",
+        value=refresh_token,
+        httponly=True,
+        secure=True,
+        samesite="None"
+    )
+    return {"message": "Login Success"}
 
 @router.post("/refresh", response_model=user_schema.Token) # 리프레시 토큰으로 액세스 토큰, 리프레시 토큰 재발급하는 엔드포인트(RTR)
-def login_users(refresh_token: str, rd=Depends(redis_config)):
+def login_users(refresh_token: str, response:Response, rd=Depends(redis_config)):
     payload = decode_refresh_token(refresh_token)
     new_access_token = create_access_token(
         payload = {"user_id": payload.get("user_id"), "user_level" : payload.get("user_level")}, role=Role.USER,
@@ -59,5 +75,21 @@ def login_users(refresh_token: str, rd=Depends(redis_config)):
     new_refresh_token = create_refresh_token(
         payload={"user_id": payload.get("user_id"), "user_level": payload.get("user_level")}, role=Role.USER,
     )
+
     rd.set(payload.get("user_id"), new_refresh_token)
-    return {"access_token": new_access_token, "refresh_token": new_refresh_token, "token_type":"bearer"}
+
+    response.set_cookie(
+        key="access_token",
+        value=new_access_token,
+        httponly=True,
+        secure=True,
+        samesite="None"
+    )
+    response.set_cookie(
+        key="refresh_token",
+        value=new_refresh_token,
+        httponly=True,
+        secure=True,
+        samesite="None"
+    )
+    return {"message": "Reissuance Success"}

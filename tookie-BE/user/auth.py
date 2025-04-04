@@ -7,7 +7,7 @@ from enum import StrEnum
 from dataclasses import dataclass
 from fastapi.security import OAuth2PasswordBearer
 from typing import Annotated
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Request
 
 from database import *
 
@@ -74,7 +74,11 @@ class CurrentUser:
     level: int
     role: Role
 
-def get_current_user(access_token: Annotated[str, Depends(oauth2_scheme)], refresh_token: Annotated[str, Depends(oauth2_scheme)]):
+def get_current_user(request:Request):
+    access_token = request.cookies.get("access_token")
+    if not access_token:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="No access token cookie")
+
     payload = decode_access_token(access_token)
     user_id = payload.get("user_id")
     role = payload.get("role")
