@@ -77,9 +77,10 @@ async def create_message(message: user_Message, current_user: Annotated[CurrentU
 # SSE 통신 (GET)
 # user_id를 url에 담아서 사용자의 데이터를 구분한다.
 @router.get("/stream/{user_id}")
-async def stream(user_id: int):
+async def stream(current_user: Annotated[CurrentUser, Depends(get_current_user)],):
     async def event_generator():
         while True:
+            user_id = current_user.id
             if user_id in backend_json:
                 user_data = backend_json.pop(user_id)
 
