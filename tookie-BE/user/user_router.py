@@ -50,10 +50,14 @@ def login_users(form_data: OAuth2PasswordRequestForm = Depends(),
     rd.set(user.user_id, refresh_token)
     return {"access_token": access_token, "refresh_token": refresh_token, "token_type":"bearer"}
 
-@router.post("/refresh", response_model=user_schema.ReToken) # 리프레시 토큰으로 액세스 토큰 재발급하는 엔드포인트
-def login_users(refresh_token: str):
+@router.post("/refresh", response_model=user_schema.Token) # 리프레시 토큰으로 액세스 토큰, 리프레시 토큰 재발급하는 엔드포인트(RTR)
+def login_users(refresh_token: str, rd=Depends(redis_config)):
     payload = decode_refresh_token(refresh_token)
     new_access_token = create_access_token(
         payload = {"user_id": payload.get("user_id"), "user_level" : payload.get("user_level")}, role=Role.USER,
     )
-    return {"access_token": new_access_token, "token_type":"bearer"}
+    new_refresh_token = create_refresh_token(
+        payload={"user_id": payload.get("user_id"), "user_level": payload.get("user_level")}, role=Role.USER,
+    )
+    rd.set(payload.get("user_id"), new_refresh_token)
+    return {"access_token": new_access_token, "refresh_token": new_refresh_token, "token_type":"bearer"}
