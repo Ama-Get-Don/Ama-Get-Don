@@ -68,7 +68,12 @@ def login_users(response:Response, form_data: OAuth2PasswordRequestForm = Depend
 
 @router.post("/refresh", response_model=user_schema.Token) # 리프레시 토큰으로 액세스 토큰, 리프레시 토큰 재발급하는 엔드포인트(RTR)
 def login_users(refresh_token: str, response:Response, rd=Depends(redis_config)):
-    payload = decode_refresh_token(refresh_token)
+    payload = decode_refresh_token(refresh_token) # 1차 검증(토큰 유효한지)
+    if verify_refresh_token(payload.get("user_id"), refresh_token, rd)==False: # 2차 검증(인메모리 DB확인)
+        raise HTTPException(
+            status_code = status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token")
+
     new_access_token = create_access_token(
         payload = {"user_id": payload.get("user_id"), "user_level" : payload.get("user_level")}, role=Role.USER,
     )

@@ -65,6 +65,11 @@ def decode_refresh_token(refresh_token: str): # 리프레시 토큰 인증
             status_code = status.HTTP_401_UNAUTHORIZED,
             detail="Invalid token"
         )
+def verify_refresh_token(user_id: int, refresh_token:str, rd): # 인메모리 DB에 있는지 확인(관리자용)
+    if rd.get(str(user_id)).decode("utf-8")==refresh_token:
+        return True
+    else:
+        return False
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/user/login")
 

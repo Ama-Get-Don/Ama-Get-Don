@@ -4,6 +4,7 @@ from sqlalchemy.orm import relationship
 from database import Base
 from enum import Enum as PyEnum
 import datetime
+import ulid
 
 class InvestmentGoal(PyEnum):
     LOW = "원금보존 가능성을 포기하기 어렵기 때문에 예적금 수익률 보다 1~2%정도만 더 나오면 됨"
@@ -38,10 +39,13 @@ class Gender(PyEnum):
     MALE = "Male"
     FEMALE = "Female"
 
+def generate_ulid():
+    return str(ulid.new())
+
 class User(Base):
     __tablename__ = 'users'
     
-    user_id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(String(26), primary_key=True, default=generate_ulid)
     tookie_id = Column(String(50), unique=True, nullable=False)
     name = Column(String(50), nullable=False)
     email = Column(String(100), unique=True, nullable=False)
@@ -57,7 +61,7 @@ class User(Base):
 class InvestmentPreference(Base):
     __tablename__ = 'investment_preferences'
     preference_id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey('users.user_id'), nullable=False)
+    user_id = Column(String(26), ForeignKey('users.user_id'), nullable=False)
 
     # 질문1
     investment_goal = Column(String(200), nullable=False)
