@@ -18,3 +18,14 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+from config.config import *
+import redis
+
+def redis_config():
+    try:
+        rd = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DATABASE)
+        return rd
+    except:
+        print("redis connection failure")
