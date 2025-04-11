@@ -10,8 +10,8 @@ from typing import Annotated
 from chat.Chain.core_Chain import *
 from chat.RAG.core_Rag import *
 
-from Sec.p_filter import filter_sensitive_info
-from Sec.input_checker import validate_input_length
+from chat.Sec.p_filter import filter_sensitive_info
+from chat.Sec.input_checker import validate_input_length
 
 from langchain_openai import ChatOpenAI
 
@@ -81,8 +81,7 @@ async def create_message(message: user_Message, current_user: Annotated[CurrentU
 
 
 # SSE 통신 (GET)
-# user_id를 url에 담아서 사용자의 데이터를 구분한다.
-@router.get("/stream/{user_id}")
+@router.get("/stream")
 async def stream(current_user: Annotated[CurrentUser, Depends(get_current_user)],):
     async def event_generator():
         while True:
@@ -102,6 +101,9 @@ async def stream(current_user: Annotated[CurrentUser, Depends(get_current_user)]
 
                 # core_Chain 비동기 방식으로 실행
                 rag_answer, agent_answer, company_answer = await core_Chain(new_user_chat, investment_level, user_info)
+                print("Rag", rag_answer+"\n")
+                print("Agent", agent_answer+"\n")
+                print("Company", company_answer+"\n")
 
                 # 3) core_Chain의 결과를 LLM이 종합(스트리밍 형태로 전송)
                 full_response = ""

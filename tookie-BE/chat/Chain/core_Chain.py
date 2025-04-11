@@ -102,17 +102,23 @@ async def core_Chain(question, investment_level, user_info):
         ### 3> 사용자 수준별로 다르게 회사정보 기반으로 질의
         # 사용자 수준 별 다른 프롬프트 제공 (사용자에 대한 정보를 반영하여 맞춤형 답변을 준다)
         if investment_level == 1:
+            print("user level=1")
             seed_prompt = await seed(question, user_info, company_info)
+            print(seed_prompt)
             seed_chain3 = seed_prompt | answer_llm | StrOutputParser()
             main_answer = await seed_chain3.ainvoke({})
 
         elif investment_level == 2:
+            print("user level=2")
             sprout_prompt = await sprout(question, user_info, company_info)
+            print(sprout_prompt)
             sprout_chain3 = sprout_prompt | answer_llm | StrOutputParser()
             main_answer = await sprout_chain3.ainvoke({})
 
         elif investment_level == 3:
+            print("user level=3")
             tookie_prompt = await tookie(question, user_info, company_info)
+            print(tookie_prompt)
             tookie_chain3 = tookie_prompt | answer_llm | StrOutputParser()
             main_answer = await tookie_chain3.ainvoke({})
         main_answer = await filter_sensitive_info(main_answer)
