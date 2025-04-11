@@ -60,7 +60,7 @@ class User(Base):
 
 class InvestmentPreference(Base):
     __tablename__ = 'investment_preferences'
-    preference_id = Column(Integer, primary_key=True, autoincrement=True)
+    preference_id = Column(String(26), primary_key=True, default=generate_ulid)
     user_id = Column(String(26), ForeignKey('users.user_id'), nullable=False)
 
     # 질문1

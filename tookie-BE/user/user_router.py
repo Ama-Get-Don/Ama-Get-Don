@@ -54,7 +54,7 @@ def login_users(response:Response, form_data: OAuth2PasswordRequestForm = Depend
         value = access_token,
         httponly=True,
         secure=True,
-        samesite="None"
+        samesite="Strict"
     )
 
     response.set_cookie(
@@ -62,7 +62,7 @@ def login_users(response:Response, form_data: OAuth2PasswordRequestForm = Depend
         value=refresh_token,
         httponly=True,
         secure=True,
-        samesite="None"
+        samesite="Strict"
     )
     return {"message": "Login Success"}
 
@@ -88,13 +88,13 @@ def login_users(refresh_token: str, response:Response, rd=Depends(redis_config))
         value=new_access_token,
         httponly=True,
         secure=True,
-        samesite="None"
+        samesite="Strict"
     )
     response.set_cookie(
         key="refresh_token",
         value=new_refresh_token,
         httponly=True,
         secure=True,
-        samesite="None"
+        samesite="Strict"
     )
     return {"message": "Reissuance Success"}
