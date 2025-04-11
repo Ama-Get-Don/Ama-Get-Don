@@ -12,6 +12,7 @@ from chat.RAG.core_Rag import *
 
 from chat.Sec.p_filter import filter_sensitive_info
 from chat.Sec.input_checker import validate_input_length
+from chat.Sec.limiter import *
 
 from langchain_openai import ChatOpenAI
 
@@ -41,6 +42,9 @@ async def create_message(message: user_Message, current_user: Annotated[CurrentU
     # 사용자 관련 정보
     ## 1) 토큰에서 user_id 추출
     user_id = current_user.id
+    # 단위 시간당 한 계정의 요청 횟수 체크
+    await rate_limiter(await get_user_key(user_id))
+
     ## 1) 토큰에서 investment_level 추출
     investment_level = current_user.level
 
