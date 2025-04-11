@@ -107,7 +107,7 @@ async def stream(current_user: Annotated[CurrentUser, Depends(get_current_user)]
                 logger.info(f"stream 데이터 처리 시작 - user_id: {user_id}, 질문: {user_chat[:30]}...")
 
                 # 이전 대화 요약
-                history_summary = summarize_history()
+                history_summary = summarize_history(user_id)
                 print("대화맥락:", history_summary)
 
                 new_user_chat = f"Previous Question and Answer Summary[{history_summary}]\n\n\n Present User Question: {user_chat}"
@@ -126,7 +126,7 @@ async def stream(current_user: Annotated[CurrentUser, Depends(get_current_user)]
                 yield "data: END\n\n"
 
                 # 전체 응답을 core_Store 함수에 전달
-                core_Store(new_user_chat.replace("Previous Question and Answer Summary", "").replace("Present User Question:", ""), full_response)
+                core_Store(user_id, new_user_chat.replace("Previous Question and Answer Summary", "").replace("Present User Question:", ""), full_response)
                 insert_one(coll, user_id, new_user_chat, full_response)
                 logger.info(f"stream 응답 전송 완료 - user_id: {user_id}")
                 break  # 한 번 응답을 보낸 후 종료
