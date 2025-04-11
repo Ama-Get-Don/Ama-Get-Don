@@ -21,6 +21,7 @@ import asyncio
 from chat.Multi_Turn.core_Store import *
 
 from user.auth import get_current_user, CurrentUser
+from config.logging_config import logger
 
 llm= ChatOpenAI(
     temperature=0.1,
@@ -37,65 +38,73 @@ coll = ConnectMongoDB()
 
 # JSON에 사용자 정보 담는다(POST)
 @router.post("")
-async def create_message(message: user_Message, current_user: Annotated[CurrentUser, Depends(get_current_user)], db: Session = Depends(get_db)):  # user_Message 형태로 매핑
+async def create_message(message: user_Message, current_user: Annotated[CurrentUser, Depends(get_current_user)], db: Session = Depends(get_db), rd=Depends(redis_config)):  # user_Message 형태로 매핑
 
     # 사용자 관련 정보
     ## 1) 토큰에서 user_id 추출
     user_id = current_user.id
-    # 단위 시간당 한 계정의 요청 횟수 체크
-    await rate_limiter(await get_user_key(user_id))
+    logger.info(f"POST /chat - user_id: {user_id} 요청 시작")
 
-    ## 1) 토큰에서 investment_level 추출
-    investment_level = current_user.level
+    try:
+        # 단위 시간당 한 계정의 요청 횟수 체크
+        rate_limiter(get_user_key(user_id), rd)
 
-    ## 2) 메시지에서 user_chat 추출 + 인풋길이 제한 + 민감정보 필터링
-    if await validate_input_length(message.user_chat)==False:
-        raise ValueError(f"입력이 너무 깁니다. 최대 {MAX_INPUT_LENGTH}자를 초과했습니다.")
-    user_chat = await filter_sensitive_info(message.user_chat)
-    print(user_id, investment_level, user_chat)
+        ## 1) 토큰에서 investment_level 추출
+        investment_level = current_user.level
 
-    ## 3) 쿼리 날려서 사용자 정보 추출
-    # 관계형 DB에 쿼리 날려서 user_info 자료구조 생성 -> 사용자에 대한 정보
-    user_info = get_UserInfo(db, user_id)
+        ## 2) 메시지에서 user_chat 추출 + 인풋길이 제한 + 민감정보 필터링
+        if await validate_input_length(message.user_chat)==False:
+            raise ValueError(f"입력이 너무 깁니다. 최대 {MAX_INPUT_LENGTH}자를 초과했습니다.")
+        user_chat = await filter_sensitive_info(message.user_chat)
+        print(user_id, investment_level, user_chat)
 
-    if not user_info:
-        return {"message": "No user info found for the given user_id"}
+        ## 3) 쿼리 날려서 사용자 정보 추출
+        # 관계형 DB에 쿼리 날려서 user_info 자료구조 생성 -> 사용자에 대한 정보
+        user_info = get_UserInfo(db, user_id)
 
-    '''
-    # 테스팅 데이터
-    mock_user_info = {
-        "investment_goal": "예적금 수익률보다 3~5%정도 기대할 수 있다면 원금보존 가능성은 좀 포기할 수 있음",
-        "risk_tolerance" : "투자원금은 반드시 보전",
-        "investment_ratio" : "10%미만",
-        "investment_period" : "1년 이하",
-        "income_status" : "정기적 수입이 있으나, 향후 감소 또는 불안정이 예상됨",
-        "derivatives_experience" : "1년 이상 3년 미만",
-        "financial_vulnerability" : "해당 사항 없음"
-    }
-    '''
+        if not user_info:
+            logger.warning(f"유저 정보 없음 - user_id: {user_id}")
+            return {"message": "No user info found for the given user_id"}
 
-    backend_json[user_id] = {
-        "user_chat": user_chat,
-        "user_info": user_info,
-        "investment_level":investment_level
-    }
-    print(backend_json[user_id])
+        '''
+        # 테스팅 데이터
+        mock_user_info = {
+            "investment_goal": "예적금 수익률보다 3~5%정도 기대할 수 있다면 원금보존 가능성은 좀 포기할 수 있음",
+            "risk_tolerance" : "투자원금은 반드시 보전",
+            "investment_ratio" : "10%미만",
+            "investment_period" : "1년 이하",
+            "income_status" : "정기적 수입이 있으나, 향후 감소 또는 불안정이 예상됨",
+            "derivatives_experience" : "1년 이상 3년 미만",
+            "financial_vulnerability" : "해당 사항 없음"
+        }
+        '''
 
-    return JSONResponse(content={"status": "ok"}, media_type="application/json; charset=utf-8")
-
+        backend_json[user_id] = {
+            "user_chat": user_chat,
+            "user_info": user_info,
+            "investment_level":investment_level
+        }
+        print(backend_json[user_id])
+        logger.info(f"user_id {user_id}의 메시지 저장 완료")
+        return JSONResponse(content={"status": "ok"}, media_type="application/json; charset=utf-8")
+    except Exception as e:
+        logger.exception(f"에러 발생 - user_id: {user_id}, error: {str(e)}")
+        raise HTTPException(status_code=500, detail="서버 오류")
 
 # SSE 통신 (GET)
 @router.get("/stream")
 async def stream(current_user: Annotated[CurrentUser, Depends(get_current_user)],):
+    user_id = current_user.id
+    logger.info(f"SSE 연결 요청 - user_id: {user_id}")
+
     async def event_generator():
         while True:
-            user_id = current_user.id
             if user_id in backend_json:
                 user_data = backend_json.pop(user_id)
-
                 user_chat = user_data['user_chat']
                 user_info = user_data['user_info']
                 investment_level = user_data['investment_level']
+                logger.info(f"stream 데이터 처리 시작 - user_id: {user_id}, 질문: {user_chat[:30]}...")
 
                 # 이전 대화 요약
                 history_summary = summarize_history()
@@ -119,6 +128,7 @@ async def stream(current_user: Annotated[CurrentUser, Depends(get_current_user)]
                 # 전체 응답을 core_Store 함수에 전달
                 core_Store(new_user_chat.replace("Previous Question and Answer Summary", "").replace("Present User Question:", ""), full_response)
                 insert_one(coll, user_id, new_user_chat, full_response)
+                logger.info(f"stream 응답 전송 완료 - user_id: {user_id}")
                 break  # 한 번 응답을 보낸 후 종료
             await asyncio.sleep(1)
 
