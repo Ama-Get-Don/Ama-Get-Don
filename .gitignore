@@ -4,6 +4,7 @@ __pycache__/
 .idea/
 tookie-BE/init_db.py
 
+tookie-BE/logs/
 tookie-BE/data/
 new_chroma_db/
 venv/
