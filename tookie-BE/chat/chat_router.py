@@ -10,6 +10,9 @@ from typing import Annotated
 from chat.Chain.core_Chain import *
 from chat.RAG.core_Rag import *
 
+from Sec.p_filter import filter_sensitive_info
+from Sec.input_checker import validate_input_length
+
 from langchain_openai import ChatOpenAI
 
 import asyncio
@@ -41,9 +44,12 @@ async def create_message(message: user_Message, current_user: Annotated[CurrentU
     ## 1) 토큰에서 investment_level 추출
     investment_level = current_user.level
 
-    ## 2) 메시지에서 user_chat 추출
-    user_chat = message.user_chat
+    ## 2) 메시지에서 user_chat 추출 + 인풋길이 제한 + 민감정보 필터링
+    if await validate_input_length(message.user_chat)==False:
+        raise ValueError(f"입력이 너무 깁니다. 최대 {MAX_INPUT_LENGTH}자를 초과했습니다.")
+    user_chat = await filter_sensitive_info(message.user_chat)
     print(user_id, investment_level, user_chat)
+
     ## 3) 쿼리 날려서 사용자 정보 추출
     # 관계형 DB에 쿼리 날려서 user_info 자료구조 생성 -> 사용자에 대한 정보
     user_info = get_UserInfo(db, user_id)

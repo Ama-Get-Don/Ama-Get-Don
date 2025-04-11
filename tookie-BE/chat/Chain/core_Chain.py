@@ -7,6 +7,7 @@ from chat.Prompt.question_extract import *
 from chat.Prompt.seed import *
 from chat.Prompt.sprout import *
 from chat.Prompt.tookie import *
+from chat.Sec.p_filter import filter_sensitive_info
 
 import ast
 
@@ -64,7 +65,7 @@ async def core_Chain(question, investment_level, user_info):
     rag_answer=""
     ## 가. RAG (순수하게 RAG 방식)
     if len(q_classification[0])!=0:
-        rag_answer = await core_Rag(q_classification[0])
+        rag_answer = await filter_sensitive_info(await core_Rag(q_classification[0]))
 
     ## 나. 투자 Main
     # 체인 생성
@@ -114,7 +115,7 @@ async def core_Chain(question, investment_level, user_info):
             tookie_prompt = await tookie(question, user_info, company_info)
             tookie_chain3 = tookie_prompt | answer_llm | StrOutputParser()
             main_answer = await tookie_chain3.ainvoke({})
-
+        main_answer = await filter_sensitive_info(main_answer)
 
     agent_answer=""
     if main_answer =="No-Knowledge":
@@ -133,7 +134,7 @@ async def core_Chain(question, investment_level, user_info):
             tools, agent_llm, agent=AgentType.SELF_ASK_WITH_SEARCH, verbose=True
         )
         agent_answer = self_ask_with_search.run(f"투자자의 질문:{q_classification[1]}, 투자자의 정보:{user_info} 반드시 한국어로 답변해줘! Please Answer me Korean!")
-
+        agent_answer = await filter_sensitive_info(agent_answer)
 
     return rag_answer, agent_answer, main_answer
 
