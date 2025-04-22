@@ -65,17 +65,24 @@ def decode_refresh_token(refresh_token: str): # 리프레시 토큰 인증
             status_code = status.HTTP_401_UNAUTHORIZED,
             detail="Invalid token"
         )
-def verify_refresh_token(user_id: int, refresh_token:str, rd): # 인메모리 DB에 있는지 확인(관리자용)
-    if rd.get(str(user_id)).decode("utf-8")==refresh_token:
-        return True
-    else:
+def verify_refresh_token(user_id: str, refresh_token:str, rd): # 인메모리 DB에 있는지 확인(관리자용)
+
+    rt_state = rd.get(refresh_token)
+    if rt_state==None:
+        if rd.get(user_id).decode("utf-8")==refresh_token:
+            return True
+        else:
+            return False
+    else: #만약 리프레시 토큰이 재사용되었으면
+        # 인메모리 DB에서 해당 세션 지움
+        rd.delete(user_id)
         return False
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/user/login")
 
 @dataclass
 class CurrentUser:
-    id: int
+    id: str
     level: int
     role: Role
 

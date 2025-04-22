@@ -82,6 +82,7 @@ def login_users(refresh_token: str, response:Response, rd=Depends(redis_config))
     )
 
     rd.set(payload.get("user_id"), new_refresh_token)
+    rd.set(refresh_token, "True") # 이미 썼던 리프레시 토큰은 True로 저장
 
     response.set_cookie(
         key="access_token",
