@@ -7,6 +7,7 @@ from chat.Prompt.question_extract import *
 from chat.Prompt.seed import *
 from chat.Prompt.sprout import *
 from chat.Prompt.tookie import *
+from chat.Sec.p_filter import filter_sensitive_info
 
 import ast
 
@@ -64,7 +65,7 @@ async def core_Chain(question, investment_level, user_info):
     rag_answer=""
     ## 가. RAG (순수하게 RAG 방식)
     if len(q_classification[0])!=0:
-        rag_answer = await core_Rag(q_classification[0])
+        rag_answer = await filter_sensitive_info(await core_Rag(q_classification[0]))
 
     ## 나. 투자 Main
     # 체인 생성
@@ -101,20 +102,26 @@ async def core_Chain(question, investment_level, user_info):
         ### 3> 사용자 수준별로 다르게 회사정보 기반으로 질의
         # 사용자 수준 별 다른 프롬프트 제공 (사용자에 대한 정보를 반영하여 맞춤형 답변을 준다)
         if investment_level == 1:
+            print("user level=1")
             seed_prompt = await seed(question, user_info, company_info)
+            print(seed_prompt)
             seed_chain3 = seed_prompt | answer_llm | StrOutputParser()
             main_answer = await seed_chain3.ainvoke({})
 
         elif investment_level == 2:
+            print("user level=2")
             sprout_prompt = await sprout(question, user_info, company_info)
+            print(sprout_prompt)
             sprout_chain3 = sprout_prompt | answer_llm | StrOutputParser()
             main_answer = await sprout_chain3.ainvoke({})
 
         elif investment_level == 3:
+            print("user level=3")
             tookie_prompt = await tookie(question, user_info, company_info)
+            print(tookie_prompt)
             tookie_chain3 = tookie_prompt | answer_llm | StrOutputParser()
             main_answer = await tookie_chain3.ainvoke({})
-
+        main_answer = await filter_sensitive_info(main_answer)
 
     agent_answer=""
     if main_answer =="No-Knowledge":
@@ -133,7 +140,7 @@ async def core_Chain(question, investment_level, user_info):
             tools, agent_llm, agent=AgentType.SELF_ASK_WITH_SEARCH, verbose=True
         )
         agent_answer = self_ask_with_search.run(f"투자자의 질문:{q_classification[1]}, 투자자의 정보:{user_info} 반드시 한국어로 답변해줘! Please Answer me Korean!")
-
+        agent_answer = await filter_sensitive_info(agent_answer)
 
     return rag_answer, agent_answer, main_answer
 

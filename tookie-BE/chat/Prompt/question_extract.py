@@ -2,12 +2,12 @@
 from langchain_core.prompts import ChatPromptTemplate
 async def question_extract(text):
     return ChatPromptTemplate.from_template(f'''
+        [사용자의 질문]    
+        {text}
+        
         너는 [사용자의 질문] 에서 1) 투자 법률 관련 질문과 2)그 외 질문 이렇게 3개를 나누어 추출하는 추출기야.
         답변을 줄때 [데이터 형식]대로 결과를 반환 해줘! 
         다른 필요없는 텍스트 붙이지 말고 오직 리스트만 반환해야해!
-
-        [사용자의 질문]    
-        {text}
 
         [데이터 형식]
         반드시 예시1), 예시2), 예시3)을 참고하여 2차원 리스트 결과 1개를 반환해줘!
