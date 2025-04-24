@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from fastapi.security import OAuth2PasswordBearer
 from typing import Annotated
 from fastapi import Depends, HTTPException, status, Request
-
+import hashlib
 from database import *
 
 #JWT 설정
@@ -65,18 +65,37 @@ def decode_refresh_token(refresh_token: str): # 리프레시 토큰 인증
             status_code = status.HTTP_401_UNAUTHORIZED,
             detail="Invalid token"
         )
-def verify_refresh_token(user_id: str, refresh_token:str, rd): # 인메모리 DB에 있는지 확인(관리자용)
 
-    rt_state = rd.get(refresh_token)
-    if rt_state==None:
-        if rd.get(user_id).decode("utf-8")==refresh_token:
-            return True
-        else:
-            return False
-    else: #만약 리프레시 토큰이 재사용되었으면
-        # 인메모리 DB에서 해당 세션 지움
-        rd.delete(user_id)
+def make_black_list_key(ip:str, ua:str):
+    target=(ip+ua)
+    key = hashlib.sha256(target.encode()).hexdigest()
+    black_key = f"BlackList-{key}"
+    return black_key
+def verify_refresh_token(user_id: str, refresh_token:str, rd, ip:str, ua:str): # 인메모리 DB에 있는지 확인(관리자용)
+    rt_state = rd.get(refresh_token) # 리프레시 토큰의 전 사용여부 확인
+    black_key = make_black_list_key(ip, ua) # 블랙리스트 키값 생성
+    # 블랙리스트에 있는지 확인
+    if rd.get(black_key).decode("utf-8")=="True":
+        print("블랙리스트에 해당 IP, User Agent 존재")
         return False
+    else:
+        if rt_state==None: # 리프레시 토큰 재사용한적 없으면
+            id_state = rd.get(user_id)
+            if id_state==None: # 해당 계정 리프레시 토큰 재사용으로 인한 삭제 -> 재로그인 필요
+                print("해당 계정 정상 사용자의 리프레시 토큰 지워짐, 재로그인 필요")
+                return False
+            else:
+                if id_state.decode("utf-8")==refresh_token:
+                    return True
+                else:
+                    return False
+        else: #만약 리프레시 토큰이 재사용되었으면
+            # 인메모리 DB에서 해당 세션 지움
+            rd.delete(user_id)
+            # 블랙리스트 등록 "Black:HASH(IP+UserAgent) : True"
+            rd.set(black_key, "True")
+            print("리프레시 토큰 재사용 됨")
+            return False
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/user/login")
 
