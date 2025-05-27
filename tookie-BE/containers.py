@@ -1,6 +1,6 @@
 from dependency_injector import containers, providers
 from user.application.user_service import UserService
-from user.infra.repository.user_repo import UserRepository
+from user.infra.repository.user_repo import UserRepository, TokenRepository
 
 
 class Container(containers.DeclarativeContainer):
@@ -8,4 +8,5 @@ class Container(containers.DeclarativeContainer):
         packages=["user"],
     )
     user_repo = providers.Factory(UserRepository)
-    user_service = providers.Factory(UserService, user_repo = user_repo)
+    token_repo = providers.Factory(TokenRepository)
+    user_service = providers.Factory(UserService, user_repo = user_repo, token_repo=token_repo)

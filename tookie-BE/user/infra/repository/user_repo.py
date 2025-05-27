@@ -1,4 +1,4 @@
-from user.domain.repository.user_repo import IUserRepository
+from user.domain.repository.user_repo import IUserRepository, ITokenRepository
 from user.domain.user import User as UserV0, InvestmentPreference as InvestmentPreferenceV0
 from user.infra.db_models.models import User, InvestmentPreference
 from database import SessionLocal
@@ -29,7 +29,6 @@ class UserRepository(IUserRepository):
         with SessionLocal() as db:
             db.add(db_investment)
             db.commit()
-
     def get_existing_user(self, tookie_id:str, email:str)->User:
         with SessionLocal() as db:
             return db.query(User).filter(
@@ -40,16 +39,16 @@ class UserRepository(IUserRepository):
     def get_id(self, id: str) -> User:
         with SessionLocal() as db:
             return db.query(User).filter(User.tookie_id == id).first()
-
-    def imdb_set(self, key:str, value:str):
+class TokenRepository(ITokenRepository):
+    def save(self, key:str, value:str):
         with redis_config() as imdb:
             imdb.set(key, value)
 
-    def imdb_get(self, key:str):
+    def get(self, key:str):
         with redis_config() as imdb:
             return imdb.get(key)
 
-    def imdb_del(self, key:str):
+    def remove(self, key:str):
         with redis_config() as imdb:
             imdb.delete(key)
 

@@ -12,15 +12,15 @@ class IUserRepository(metaclass=ABCMeta):
     @abstractmethod
     def get_id(self, id: str):
         raise NotImplementedError
-
+class ITokenRepository(metaclass=ABCMeta):
     @abstractmethod
-    def imdb_set(self, key:str, value:str):
+    def save(self, key:str, value:str):
         raise NotImplementedError
 
     @abstractmethod
-    def imdb_get(self, key: str):
+    def get(self, key: str):
         raise NotImplementedError
 
     @abstractmethod
-    def imdb_del(self, key: str):
+    def remove(self, key: str):
         raise NotImplementedError
