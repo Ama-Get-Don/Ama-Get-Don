@@ -6,6 +6,8 @@ from user.interface.validators.user_validate import CreateUserBody, CreateInvest
 from fastapi import HTTPException
 from dependency_injector.wiring import inject
 
+from fastapi import status
+from user.security.auth import create_access_token, create_refresh_token, Role
 class UserService:
     @inject
     def __init__(self, user_repo: IUserRepository, ):
@@ -45,3 +47,23 @@ class UserService:
 
         self.user_repo.save(user, investment)
         return user
+
+    def login(self, id:str, password:str):
+        user = self.user_repo.get_id(id)
+        if not user or not self.crypto.verify(password, user.password):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Incorrect username or password",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        access_token = create_access_token(
+            payload = {"user_id": user.tookie_id, "user_level":user.investment_level}, role=Role.USER,
+        )
+
+        refresh_token = create_refresh_token(
+        payload = {"user_id": user.tookie_id, "user_level":user.investment_level}, role=Role.USER,
+        )
+
+        self.user_repo.store_refresh_token(id, refresh_token)
+
+        return access_token, refresh_token

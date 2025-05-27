@@ -1,11 +1,8 @@
-from fastapi import APIRouter, HTTPException
-from starlette import status
+from fastapi import APIRouter
 from fastapi.responses import JSONResponse, StreamingResponse
 from chat.dto.user_Message import *
-from chat.Multi_Turn.core_Store import *
 
 from chat.chat_crud import *
-from fastapi import Depends
 from typing import Annotated
 from chat.Chain.core_Chain import *
 from chat.RAG.core_Rag import *
@@ -20,7 +17,7 @@ import asyncio
 
 from chat.Multi_Turn.core_Store import *
 
-from user.auth import get_current_user, CurrentUser
+from user.security.auth import get_current_user, CurrentUser
 from config.logging_config import logger
 
 llm= ChatOpenAI(

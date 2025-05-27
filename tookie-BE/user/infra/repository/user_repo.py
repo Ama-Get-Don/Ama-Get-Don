@@ -1,10 +1,8 @@
 from user.domain.repository.user_repo import IUserRepository
 from user.domain.user import User as UserV0, InvestmentPreference as InvestmentPreferenceV0
 from user.infra.db_models.models import User, InvestmentPreference
-from sqlalchemy.orm import Session
-from dependency_injector.wiring import inject
-
 from database import SessionLocal
+from database import redis_config
 class UserRepository(IUserRepository):
     def save(self, user: UserV0, investment:InvestmentPreferenceV0):
         db_user = User(tookie_id = user.tookie_id,
@@ -32,13 +30,17 @@ class UserRepository(IUserRepository):
             db.add(db_investment)
             db.commit()
 
-    def get_existing_user(self, tookie_id:str, email:str) -> UserV0:
+    def get_existing_user(self, tookie_id:str, email:str)->User:
         with SessionLocal() as db:
             return db.query(User).filter(
                     (User.name == tookie_id) |
                     (User.email == email)
                 ).first()
 
-    def get_id(self, id: str) -> UserV0:
+    def get_id(self, id: str) -> User:
         with SessionLocal() as db:
             return db.query(User).filter(User.tookie_id == id).first()
+
+    def store_refresh_token(self, id:str, refresh_token:str):
+        with redis_config() as rdb:
+            rdb.set(id, refresh_token)

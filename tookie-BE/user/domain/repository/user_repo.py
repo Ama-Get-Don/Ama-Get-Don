@@ -8,9 +8,13 @@ class IUserRepository(metaclass=ABCMeta):
         raise NotImplementedError
 
     @abstractmethod
-    def get_existing_user(self, tookie_id:str, email:str) -> User:
+    def get_existing_user(self, tookie_id:str, email:str):
         raise NotImplementedError
 
     @abstractmethod
-    def get_id(self, id: str) -> User:
+    def get_id(self, id: str):
+        raise NotImplementedError
+
+    @abstractmethod
+    def store_refresh_token(self, id:str, refresh_token:str):
         raise NotImplementedError
