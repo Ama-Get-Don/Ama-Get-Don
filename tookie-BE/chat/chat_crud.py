@@ -1,5 +1,4 @@
-from database import get_db
-from models import *
+from user.infra.db_models.models import *
 from sqlalchemy.orm import Session
 from pymongo import MongoClient
 from config.config import *

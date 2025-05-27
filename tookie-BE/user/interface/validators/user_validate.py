@@ -1,9 +1,7 @@
-# user_schema.py
 from pydantic import BaseModel, EmailStr, field_validator
 from pydantic_core.core_schema import FieldValidationInfo
-import datetime
 
-class UserCreate(BaseModel):
+class CreateUserBody(BaseModel):
     tookie_id : str
     name: str
     password1: str
@@ -29,8 +27,7 @@ class UserCreate(BaseModel):
     class Config:
         from_attributes = True
 
-class InvestmentPreferenceCreate(BaseModel):
-
+class CreateInvestmentPreferenceBody(BaseModel):
     investment_goal: str
     risk_tolerance: str
     investment_ratio: str

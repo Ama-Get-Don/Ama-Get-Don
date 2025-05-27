@@ -1,31 +1,26 @@
-from fastapi import APIRouter, HTTPException
-from fastapi import Depends
-from fastapi import Response
-from sqlalchemy.orm import Session
-from fastapi.security import OAuth2PasswordRequestForm
-from database import get_db
-from user import user_crud, user_schema
-from user.user_crud import pwd_context
+from fastapi import APIRouter
+from user.interface.validators.user_validate import CreateUserBody, CreateInvestmentPreferenceBody
 from user.auth import *
-from user.utils import *
 
-from database import redis_config
+from user.application.user_service import UserService
+from dependency_injector.wiring import inject, Provide
+from containers import Container
+from fastapi import Depends
 
 router = APIRouter(
-    prefix="/api/user",
+    prefix="/users",
 )
 
-
 @router.post("/create", status_code=status.HTTP_204_NO_CONTENT)
-def user_create(user_create: user_schema.UserCreate, investmentPreference_create: user_schema.InvestmentPreferenceCreate, db: Session = Depends(get_db)):
-    user = user_crud.get_existing_user(db, user_create=user_create)
-    if user:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT,
-                            detail="이미 존재하는 사용자입니다.")
-    user_crud.create_user(db=db, user_create=user_create, investmentPreference_create= investmentPreference_create)
+@inject
+def user_create(user_create: CreateUserBody,
+                investmentPreference_create: CreateInvestmentPreferenceBody,
+                user_service: UserService = Depends(Provide[Container.user_service]),):
+    created_user = user_service.create_user(user_create, investmentPreference_create)
+    return created_user
 
-
-@router.post("/login", response_model=user_schema.Token)
+'''
+@router.post("/login", response_model=user_validate.Token)
 def login_users(response:Response, form_data: OAuth2PasswordRequestForm = Depends(),
                            db: Session = Depends(get_db), rd=Depends(redis_config)):
     # id, pw 검증
@@ -67,7 +62,7 @@ def login_users(response:Response, form_data: OAuth2PasswordRequestForm = Depend
     )
     return {"message": "Login Success"}
 
-@router.post("/refresh", response_model=user_schema.Token) # 리프레시 토큰으로 액세스 토큰, 리프레시 토큰 재발급하는 엔드포인트(RTR)
+@router.post("/refresh", response_model=user_validate.Token) # 리프레시 토큰으로 액세스 토큰, 리프레시 토큰 재발급하는 엔드포인트(RTR)
 def login_users(refresh_token: str, request:Request, response:Response, rd=Depends(redis_config)):
     payload = decode_refresh_token(refresh_token) # 1차 검증(토큰 유효한지)
     
@@ -104,3 +99,4 @@ def login_users(refresh_token: str, request:Request, response:Response, rd=Depen
         samesite="Strict"
     )
     return {"message": "Reissuance Success"}
+'''

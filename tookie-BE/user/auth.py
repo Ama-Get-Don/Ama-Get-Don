@@ -81,7 +81,7 @@ def verify_refresh_token(user_id: str, refresh_token:str, rd, ip:str, ua:str): #
     else:
         if rt_state==None: # 리프레시 토큰 재사용한적 없으면
             id_state = rd.get(user_id)
-            if id_state==None: # 해당 계정 리프레시 토큰 재사용으로 인한 삭제 -> 재로그인 필요
+            if id_state==None: # (해당 계정 리프레시 토큰 재사용으로 인한 삭제 or 관리자가 임의로 삭제) -> 재로그인 필요
                 print("해당 계정 정상 사용자의 리프레시 토큰 지워짐, 재로그인 필요")
                 return False
             else:
