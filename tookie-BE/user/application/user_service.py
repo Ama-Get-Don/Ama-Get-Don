@@ -7,7 +7,7 @@ from fastapi import HTTPException
 from dependency_injector.wiring import inject
 
 from fastapi import status
-from user.security.auth import create_access_token, create_refresh_token, Role
+from user.security.auth import create_access_token, create_refresh_token, Role, decode_refresh_token, make_black_list_key
 class UserService:
     @inject
     def __init__(self, user_repo: IUserRepository, ):
@@ -57,13 +57,62 @@ class UserService:
                 headers={"WWW-Authenticate": "Bearer"},
             )
         access_token = create_access_token(
-            payload = {"user_id": user.tookie_id, "user_level":user.investment_level}, role=Role.USER,
+            payload = {"user_id": user.user_id, "user_level":user.investment_level}, role=Role.USER,
         )
 
         refresh_token = create_refresh_token(
-        payload = {"user_id": user.tookie_id, "user_level":user.investment_level}, role=Role.USER,
+        payload = {"user_id": user.user_id, "user_level":user.investment_level}, role=Role.USER,
         )
 
-        self.user_repo.store_refresh_token(id, refresh_token)
+        self.user_repo.imdb_set(user.user_id, refresh_token)
 
         return access_token, refresh_token
+
+    def renew(self, refresh_token:str, ip:str, user_agent:str):
+        payload = decode_refresh_token(refresh_token) # 1차 검증(토큰 유효한지)
+        user_id = payload.get("user_id")
+        user_level = payload.get("user_level")
+        refresh_token_state = self.user_repo.imdb_get(refresh_token) # 리프레시 토큰의 전 사용여부 확인
+
+        black_key = make_black_list_key(ip, user_agent) # 블랙리스트 키값 생성
+        black_val = self.user_repo.imdb_get(black_key)
+        # 블랙리스트에 있는지 확인
+        if black_val is not None and black_val.decode("utf-8") == "True":
+            print("블랙리스트에 해당 IP, User Agent 존재")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token")
+        else:
+            if refresh_token_state == None:  # 리프레시 토큰 재사용한적 없으면
+                id_state = self.user_repo.imdb_get(user_id)
+                if id_state == None:  # 해당 계정 리프레시 토큰 재사용으로 인한 삭제 -> 재로그인 필요
+                    print("해당 계정 정상 사용자의 리프레시 토큰 지워짐, 재로그인 필요")
+                    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+                else:
+                    if id_state.decode("utf-8") == refresh_token:
+                        new_access_token = create_access_token(
+                            payload={"user_id": user_id, "user_level": user_level},
+                            role=Role.USER,
+                        )
+
+                        new_refresh_token = create_refresh_token(
+                            payload={"user_id": user_id, "user_level": user_level},
+                            role=Role.USER,
+                        )
+
+                        self.user_repo.imdb_set(user_id, new_refresh_token)
+                        self.user_repo.imdb_set(refresh_token, "True")  # 이미 썼던 리프레시 토큰은 True로 저장
+
+                        return new_access_token, new_refresh_token
+                    else:
+                        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+            else:  # 만약 리프레시 토큰이 재사용되었으면
+                # 인메모리 DB에서 해당 세션 지움
+                self.user_repo.imdb_del(user_id)
+
+                # 블랙리스트 등록 "Black:HASH(IP+UserAgent) : True"
+                self.user_repo.imdb_set(black_key, "True")
+                print("리프레시 토큰 재사용 됨")
+
+                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="Invalid token")
+

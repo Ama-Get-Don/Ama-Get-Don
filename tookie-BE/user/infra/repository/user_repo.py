@@ -41,6 +41,16 @@ class UserRepository(IUserRepository):
         with SessionLocal() as db:
             return db.query(User).filter(User.tookie_id == id).first()
 
-    def store_refresh_token(self, id:str, refresh_token:str):
-        with redis_config() as rdb:
-            rdb.set(id, refresh_token)
+    def imdb_set(self, key:str, value:str):
+        with redis_config() as imdb:
+            imdb.set(key, value)
+
+    def imdb_get(self, key:str):
+        with redis_config() as imdb:
+            return imdb.get(key)
+
+    def imdb_del(self, key:str):
+        with redis_config() as imdb:
+            imdb.delete(key)
+
+
