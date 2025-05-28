@@ -25,13 +25,11 @@ class ChatRepository(IChatRepository):
 class LimitRepository(ILimitRepository):
     def get(self, key: str):
         with redis_config() as imdb:
-            imdb.get(key)
-            return
+            return imdb.get(key)
 
     def count(self, key:str):
         with redis_config() as imdb:
             imdb.incr(key)
-            return
     def set_limit(self, user_key: str):
         with redis_config() as imdb:
             # 첫 요청: 카운트 1로 설정하고 TTL 부여
@@ -39,4 +37,3 @@ class LimitRepository(ILimitRepository):
             pipe.set(user_key, 1)  # current는 1부터 시작
             pipe.expire(user_key, 60)  # 타임 만료되면 사라짐
             pipe.execute()
-            return

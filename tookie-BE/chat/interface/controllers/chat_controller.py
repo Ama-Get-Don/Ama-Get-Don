@@ -38,7 +38,7 @@ async def create_message(session_id:str, message: ChatBody, current_user: Annota
     chat_time = datetime.utcnow()
     try:
         # 단위 시간당 한 계정의 요청 횟수 체크
-        # chat_service.rate_limiter(user_id)
+        chat_service.rate_limiter(user_id)
 
         # 민감 정보 필터링
         user_chat = await filter_sensitive_info(message.user_chat)

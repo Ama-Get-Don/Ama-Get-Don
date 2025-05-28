@@ -15,13 +15,12 @@ class ChatService:
         self.limit_repo = limit_repo
 
     def rate_limiter(self, user_id:str):
-        user_key = f"rate_limit: {user_id}"
+        user_key = f"rate_limit:{user_id}"
         user_value = self.limit_repo.get(user_key)
 
         if user_value is None:
             self.limit_repo.set_limit(user_key)
-
-        if int(user_value) >= RATE_LIMIT:  # 만약 시간내에 현재 요청한 값이 RATE_LIMIT 이상이면
+        elif int(user_value) >= RATE_LIMIT:  # 만약 시간내에 현재 요청한 값이 RATE_LIMIT 이상이면
             raise HTTPException(
                 status_code=HTTP_429_TOO_MANY_REQUESTS,
                 detail="Rate limit exceeded. Please wait and try again.")
