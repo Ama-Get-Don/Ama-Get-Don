@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from config.config import *
-from pymongo import MongoClient
+from motor.motor_asyncio import AsyncIOMotorClient
 from config.config import *
 import redis
 
@@ -15,7 +15,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 def ConnectMongoDB():
-    client = MongoClient(MONGO_LOCATION)
+    client = AsyncIOMotorClient(MONGO_LOCATION)
     mydb = client["tookie-db"]
     mycol = mydb["chat"]
     return mycol
