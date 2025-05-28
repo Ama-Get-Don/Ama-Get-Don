@@ -44,7 +44,7 @@ def generate_ulid():
 
 class User(Base):
     __tablename__ = 'users'
-    
+
     user_id = Column(String(26), primary_key=True, default=generate_ulid)
     tookie_id = Column(String(50), unique=True, nullable=False)
     name = Column(String(50), nullable=False)
