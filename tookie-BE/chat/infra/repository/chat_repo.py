@@ -1,5 +1,5 @@
 from chat.domain.repository.chat_repo import ILimitRepository, IChatRepository
-from database import redis_config
+from database import async_redis_config
 from database import ConnectMongoDB
 from datetime import datetime
 class ChatRepository(IChatRepository):
@@ -24,16 +24,16 @@ class ChatRepository(IChatRepository):
         return result.modified_count  # 1이면 성공, 0이면 실패(조건 불일치)
 class LimitRepository(ILimitRepository):
     async def get(self, key: str):
-        with redis_config() as imdb:
-            return imdb.get(key)
+        async with async_redis_config() as imdb:
+            return await imdb.get(key)
 
     async def count(self, key:str):
-        with redis_config() as imdb:
-            imdb.incr(key)
+        async with async_redis_config() as imdb:
+            await imdb.incr(key)
     async def set_limit(self, user_key: str):
-        with redis_config() as imdb:
+        async with async_redis_config() as imdb:
             # 첫 요청: 카운트 1로 설정하고 TTL 부여
             pipe = imdb.pipeline() # 파이프라인을 통해 밑 2개 한번에 처리(성능 up)
-            pipe.set(user_key, 1)  # current는 1부터 시작
-            pipe.expire(user_key, 60)  # 타임 만료되면 사라짐
-            pipe.execute()
+            await pipe.set(user_key, 1)  # current는 1부터 시작
+            await pipe.expire(user_key, 60)  # 타임 만료되면 사라짐
+            await pipe.execute()

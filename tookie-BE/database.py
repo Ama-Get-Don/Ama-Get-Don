@@ -7,6 +7,7 @@ from config.config import *
 from motor.motor_asyncio import AsyncIOMotorClient
 from config.config import *
 import redis
+from redis.asyncio import Redis
 
 DATABASE_URL = DB_LOCATION
 
@@ -30,6 +31,12 @@ def get_db():
 def redis_config():
     try:
         rd = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DATABASE)
+        return rd
+    except:
+        print("redis connection failure")
+def async_redis_config():
+    try:
+        rd = Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DATABASE)
         return rd
     except:
         print("redis connection failure")
