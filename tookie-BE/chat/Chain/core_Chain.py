@@ -1,4 +1,3 @@
-import os
 from langchain_openai import ChatOpenAI
 from langchain_core.output_parsers import StrOutputParser
 
@@ -7,7 +6,7 @@ from chat.Prompt.question_extract import *
 from chat.Prompt.seed import *
 from chat.Prompt.sprout import *
 from chat.Prompt.tookie import *
-from chat.Sec.p_filter import filter_sensitive_info
+from utils.security.p_filter import filter_sensitive_info
 
 import ast
 

@@ -12,6 +12,9 @@ class IUserRepository(metaclass=ABCMeta):
     @abstractmethod
     def get_id(self, id: str):
         raise NotImplementedError
+
+    def get_user_investment_preference(self, user_id: str):
+        raise NotImplementedError
 class ITokenRepository(metaclass=ABCMeta):
     @abstractmethod
     def save(self, key:str, value:str):

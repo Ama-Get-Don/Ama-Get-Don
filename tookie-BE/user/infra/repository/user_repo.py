@@ -39,6 +39,10 @@ class UserRepository(IUserRepository):
     def get_id(self, id: str) -> User:
         with SessionLocal() as db:
             return db.query(User).filter(User.tookie_id == id).first()
+
+    def get_user_investment_preference(self, user_id: str):
+        with SessionLocal() as db:
+            return db.query(InvestmentPreference).filter(InvestmentPreference.user_id == user_id).first()
 class TokenRepository(ITokenRepository):
     def save(self, key:str, value:str):
         with redis_config() as imdb:

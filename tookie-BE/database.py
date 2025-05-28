@@ -4,12 +4,21 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from config.config import *
+from pymongo import MongoClient
+from config.config import *
+import redis
 
 DATABASE_URL = DB_LOCATION
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
+
+def ConnectMongoDB():
+    client = MongoClient(MONGO_LOCATION)
+    mydb = client["tookie-db"]
+    mycol = mydb["chat"]
+    return mycol
 
 #의존성 주입
 def get_db():
@@ -18,11 +27,6 @@ def get_db():
         yield db
     finally:
         db.close()
-
-
-from config.config import *
-import redis
-
 def redis_config():
     try:
         rd = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DATABASE)

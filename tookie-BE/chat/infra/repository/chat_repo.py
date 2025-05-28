@@ -1,0 +1,42 @@
+from chat.domain.repository.chat_repo import ILimitRepository, IChatRepository
+from database import redis_config
+from database import ConnectMongoDB
+from datetime import datetime
+class ChatRepository(IChatRepository):
+    def find_session(self, session_id:str, user_id:str):
+        db = ConnectMongoDB()
+        data = db.find_one({"session_id":session_id, "user_id":user_id})
+        return data
+    def update_chat(self, user_id:str, user_chat:str, session_id:str, chat_time:datetime):
+        db= ConnectMongoDB()
+        user_message = {
+                "timestamp":chat_time,
+                "sender":"user",
+                "text": user_chat
+            }
+        result = db.update_one(
+                {"session_id": session_id, "user_id": user_id},
+                {
+                    "$push": {"messages": user_message},
+                },
+                upsert=True  # True로 하면 세션이 없을 때 새로 생성
+            )
+        return result.modified_count  # 1이면 성공, 0이면 실패(조건 불일치)
+class LimitRepository(ILimitRepository):
+    def get(self, key: str):
+        with redis_config() as imdb:
+            imdb.get(key)
+            return
+
+    def count(self, key:str):
+        with redis_config() as imdb:
+            imdb.incr(key)
+            return
+    def set_limit(self, user_key: str):
+        with redis_config() as imdb:
+            # 첫 요청: 카운트 1로 설정하고 TTL 부여
+            pipe = imdb.pipeline() # 파이프라인을 통해 밑 2개 한번에 처리(성능 up)
+            pipe.set(user_key, 1)  # current는 1부터 시작
+            pipe.expire(user_key, 60)  # 타임 만료되면 사라짐
+            pipe.execute()
+            return
