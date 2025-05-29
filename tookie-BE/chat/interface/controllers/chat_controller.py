@@ -8,7 +8,7 @@ from langchain_openai import ChatOpenAI
 
 import asyncio
 
-from chat.Multi_Turn.core_Store import *
+from chat.conversation.core_Store import *
 
 from utils.security.auth import get_current_user, CurrentUser
 from config.logging_config import logger
@@ -48,12 +48,13 @@ async def create_message(session_id:str, message: ChatBody, current_user: Annota
         return JSONResponse(content={"status": "ok"}, media_type="application/json; charset=utf-8")
     except Exception as e:
         raise HTTPException(status_code=500, detail="서버 오류")
-'''
+
 # SSE 통신 (GET)
-@router.get("/stream")
-async def stream(current_user: Annotated[CurrentUser, Depends(get_current_user)],):
+@router.get("/{session_id}")
+@inject
+async def stream(session_id:str, current_user: Annotated[CurrentUser, Depends(get_current_user)],
+                 chat_service: ChatService = Depends(Provide[Container.chat_service])):
     user_id = current_user.id
-    logger.info(f"SSE 연결 요청 - user_id: {user_id}")
 
     async def event_generator():
         while True:
@@ -62,7 +63,6 @@ async def stream(current_user: Annotated[CurrentUser, Depends(get_current_user)]
                 user_chat = user_data['user_chat']
                 user_info = user_data['user_info']
                 investment_level = user_data['investment_level']
-                logger.info(f"stream 데이터 처리 시작 - user_id: {user_id}, 질문: {user_chat[:30]}...")
 
                 # 이전 대화 요약
                 history_summary = summarize_history(user_id)
@@ -91,4 +91,3 @@ async def stream(current_user: Annotated[CurrentUser, Depends(get_current_user)]
             await asyncio.sleep(1)
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
-'''

@@ -6,6 +6,10 @@ class IChatRepository(metaclass=ABCMeta):
         raise NotImplementedError
 
     @abstractmethod
+    async def create_chat(self, user_id: str, user_chat: str, session_id: str, chat_time: datetime):
+        raise NotImplementedError
+
+    @abstractmethod
     async def update_chat(self, user_id:str, user_chat:str, session_id:str, chat_time:datetime):
         raise NotImplementedError
 

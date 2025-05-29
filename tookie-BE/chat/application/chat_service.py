@@ -32,8 +32,18 @@ class ChatService:
         # 만약 session_id, user_id가 NoSQL DB에 존재하면, 대화를 이어서 진행
         if session_id=="" or (await self.chat_repo.find_session(session_id, user_id) is None):# 만약 session_id가 NoSQL DB에 존재하지 않거나 비어있으면, 세션ID 발급
             session_id = str(uuid.uuid4())
-        await self.chat_repo.update_chat(user_id, user_chat, session_id, chat_time) # 세션 찾거나 새롭게 몽고 DB에 사용자 질의 저장
+            await self.chat_repo.create_chat(user_id, user_chat, session_id, chat_time)
+        else:
+            await self.chat_repo.update_chat(user_id, user_chat, session_id, chat_time) # 세션 찾거나 새롭게 몽고 DB에 사용자 질의 저장
         return
+
+    async def stream_answer(self, session_id:str, user_id:str, investment_level:int):
+        # 만약 session_id, user_id가 NoSQL DB에 존재하면
+        user_chat_data = await self.chat_repo.find_session(session_id, user_id)
+        if user_chat_data is not None:
+            user_chat = user_chat_data.messages[-1].text
+            user_investment_preference = self.user_repo.get_user_investment_preference(user_id)
+            user_chat_summary = user_chat_data.
 
 
 

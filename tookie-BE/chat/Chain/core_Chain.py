@@ -6,7 +6,7 @@ from chat.Prompt.question_extract import *
 from chat.Prompt.seed import *
 from chat.Prompt.sprout import *
 from chat.Prompt.tookie import *
-from utils.security.p_filter import filter_sensitive_info
+from utils.security.filter import filter_sensitive_info
 
 import ast
 
