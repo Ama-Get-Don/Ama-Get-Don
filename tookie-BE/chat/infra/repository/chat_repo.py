@@ -18,11 +18,11 @@ class ChatRepository(IChatRepository):
         user_chat_data = {
             "session_id":session_id,
             "user_id":user_id,
-            "summary":"",
-            "messages":user_message
+            "history":"",
+            "messages":[user_message]
         }
         result = await db.insert_one(user_chat_data)
-        return result.modified_count  # 1이면 성공, 0이면 실패(조건 불일치)
+        return
 
     async def update_chat(self, user_id:str, user_chat:str, session_id:str, chat_time:datetime):
         db= ConnectMongoDB()

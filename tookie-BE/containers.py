@@ -4,6 +4,7 @@ from user.infra.repository.user_repo import UserRepository, TokenRepository
 
 from chat.application.chat_service import ChatService
 from chat.infra.repository.chat_repo import ChatRepository, LimitRepository
+from chat.infra.agent.llm_agent import LLMChain
 
 class Container(containers.DeclarativeContainer):
     wiring_config = containers.WiringConfiguration(
@@ -15,4 +16,5 @@ class Container(containers.DeclarativeContainer):
 
     limit_repo = providers.Factory(LimitRepository)
     chat_repo = providers.Factory(ChatRepository)
-    chat_service = providers.Factory(ChatService, chat_repo = chat_repo, limit_repo=limit_repo, user_repo= user_repo)
+    llm_chain = providers.Factory(LLMChain)
+    chat_service = providers.Factory(ChatService, chat_repo = chat_repo, limit_repo=limit_repo, user_repo= user_repo, llm_chain=llm_chain)
