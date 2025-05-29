@@ -40,10 +40,11 @@ async def stream(session_id:str, current_user: Annotated[CurrentUser, Depends(ge
     user_id = current_user.id
     user_level = current_user.level
     async def event_generator():
-        full_response = ""
+        llm_response = ""
         async for llm_token in chat_service.stream_answer(session_id, user_id, user_level):
             yield f"data: {llm_token.content}\n\n"
-            full_response += llm_token.content
+            llm_response += llm_token.content
         yield "data: END\n\n"
+        await chat_service.keep_multi_turn(session_id, user_id, llm_response)
         await asyncio.sleep(0.1)
     return StreamingResponse(event_generator(), media_type="text/event-stream")

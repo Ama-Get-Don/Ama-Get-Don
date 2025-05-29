@@ -14,11 +14,18 @@ from chat.infra.agent.prompt.system_prompt import create_divide_prompt, create_a
 
 from langchain_openai import ChatOpenAI
 
+from llama_index.core.memory import ChatSummaryMemoryBuffer
+from llama_index.core.llms import ChatMessage, MessageRole
+from llama_index.llms.openai import OpenAI as OpenAiLlm
+import tiktoken
+
 class LLMChain(ILLMChain):
+    user_memory_dict = {}
     def __init__(self):
         self.divide_llm = ChatOpenAI(model="gpt-4", temperature=0.2, openai_api_key=OPENAI_API_KEY)
         self.ask_llm = ChatOpenAI(model="gpt-4o", temperature=0.7, openai_api_key=OPENAI_API_KEY)
-
+        self.summarizer_llm = OpenAiLlm(model_name="gpt-4-0125-preview", max_tokens=256)  # 요약해서 생성하는 토큰의 수는 256이 최대이다.
+        self.tokenizer_fn = tiktoken.encoding_for_model("gpt-4-0125-preview").encode
     async def divide_chat(self, user_chat:str):
         divide_prompt = await create_divide_prompt(user_chat)
         response = await self.divide_llm.ainvoke(divide_prompt)
@@ -56,3 +63,27 @@ class LLMChain(ILLMChain):
 
         for token in self.ask_llm.stream(ask_prompt):
             yield token
+
+    async def get_buffer(self, session_id: str):
+        if session_id not in self.user_memory_dict:
+            # 새로운 사용자에 대해 buffer 생성
+            self.user_memory_dict[session_id] = ChatSummaryMemoryBuffer.from_defaults(
+                llm=self.summarizer_llm,
+                token_limit=1024,
+                tokenizer_fn=self.tokenizer_fn,
+            )
+        return self.user_memory_dict[session_id]
+
+    async def push_to_buffer(self, session_id: str, role: str, content: str):
+        memory = await self.get_buffer(session_id)
+        message = ChatMessage(role=role, content=content)
+        print("content", content)
+        memory.put(message)
+
+    async def pop_from_buffer(self, session_id: str):
+        if session_id in self.user_memory_dict:
+            memory = self.user_memory_dict[session_id]
+            history = memory.get()
+            return " ".join([msg.content for msg in history])
+        else:
+            return ""

@@ -13,6 +13,10 @@ class IChatRepository(metaclass=ABCMeta):
     async def update_chat(self, user_id:str, user_chat:str, session_id:str, chat_time:datetime):
         raise NotImplementedError
 
+    @abstractmethod
+    async def save_history(self, session_id:str, user_id:str, history:str):
+        raise NotImplementedError
+
 class ILimitRepository(metaclass=ABCMeta):
     @abstractmethod
     async def get(self, key: str):

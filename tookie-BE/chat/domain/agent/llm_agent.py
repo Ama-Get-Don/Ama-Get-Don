@@ -23,3 +23,25 @@ class ILLMChain(metaclass=ABCMeta):
         최종 LLM에 질의
         '''
         raise NotImplementedError
+
+    @abstractmethod
+    async def get_buffer(self, session_id: str):
+        '''
+        세션별 버퍼 객체 불러옴
+        '''
+        raise NotImplementedError
+
+    @abstractmethod
+    async def push_to_buffer(self, session_id: str, role: str, content: str):
+        '''
+        버퍼에 대화 저장
+        '''
+        raise NotImplementedError
+
+    @abstractmethod
+    async def pop_from_buffer(self, session_id: str):
+        '''
+        버퍼에서 히스토리 꺼냄
+        '''
+        raise NotImplementedError
+
