@@ -77,7 +77,6 @@ class LLMChain(ILLMChain):
     async def push_to_buffer(self, session_id: str, role: str, content: str):
         memory = await self.get_buffer(session_id)
         message = ChatMessage(role=role, content=content)
-        print("content", content)
         memory.put(message)
 
     async def pop_from_buffer(self, session_id: str):

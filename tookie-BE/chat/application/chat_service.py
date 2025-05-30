@@ -60,22 +60,18 @@ class ChatService:
     # 버퍼의 값을 계속해서 히스토리에 업데이트하고, 히스토리에서 가져옴
     async def keep_multi_turn(self, session_id:str, user_id:str, llm_response:str):
         user_data = await self.chat_repo.find_session(session_id, user_id)
-        print("유저의 데이터", user_data)
         # 만약 버퍼가 비었으면 히스토리를 가져와서 버퍼에 담음
         if (await self.llm_chain.pop_from_buffer(session_id)) == "":
             user_history = user_data['history']
-            print("꺼내온 히스토리", user_history)
             await self.llm_chain.push_to_buffer(session_id, "user", user_history)
 
         # 현재 질의한 내용과 답변을 버퍼에 저장
         user_chat = user_data["messages"][-1]["text"]
-        print("버퍼에 저장 시작", user_chat)
         await self.llm_chain.push_to_buffer(session_id, "user", user_chat)
         await self.llm_chain.push_to_buffer(session_id, "assistant", llm_response)
 
         # 버퍼에서 꺼내서 No SQL에 업데이트
         buffer_history = await self.llm_chain.pop_from_buffer(session_id)
-        print("NosQL에 삽입", buffer_history)
         await self.chat_repo.save_history(session_id, user_id, buffer_history)
 
         return
