@@ -86,7 +86,7 @@ class CurrentUser:
     level: int
     role: Role
 
-def get_current_user(request:Request):
+async def get_current_user(request:Request):
     access_token = request.cookies.get("access_token")
     if not access_token:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="No access token cookie")

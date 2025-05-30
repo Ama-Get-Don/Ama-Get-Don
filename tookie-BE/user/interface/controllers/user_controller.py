@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from user.interface.validators.user_validate import CreateUserBody, CreateInvestmentPreferenceBody, Token
-from user.security.auth import *
+from user.interface.validators.user_validator import CreateUserBody, CreateInvestmentPreferenceBody, Token
+from utils.security.auth import *
 from user.application.user_service import UserService
 from dependency_injector.wiring import inject, Provide
 from containers import Container

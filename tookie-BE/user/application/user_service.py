@@ -1,13 +1,13 @@
-from utils.crypto import Crypto
+from utils.security.crypto import Crypto
 from datetime import datetime
 from user.domain.user import User, InvestmentPreference
 from user.domain.repository.user_repo import IUserRepository, ITokenRepository
-from user.interface.validators.user_validate import CreateUserBody, CreateInvestmentPreferenceBody
+from user.interface.validators.user_validator import CreateUserBody, CreateInvestmentPreferenceBody
 from fastapi import HTTPException
 from dependency_injector.wiring import inject
 
 from fastapi import status
-from user.security.auth import create_access_token, create_refresh_token, Role, decode_refresh_token, make_black_list_key
+from utils.security.auth import create_access_token, create_refresh_token, Role, decode_refresh_token, make_black_list_key
 class UserService:
     @inject
     def __init__(self, user_repo: IUserRepository, token_repo: ITokenRepository):
